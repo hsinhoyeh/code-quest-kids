@@ -102,7 +102,15 @@ body {
 /* ---------- play screen ---------- */
 .play-topline { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
 .play-topline h2 { margin: 0; font-size: 1.4rem; color: var(--primary-d); }
-.goal-hint { margin-left: auto; background: #fff; padding: 8px 14px; border-radius: 999px; box-shadow: var(--shadow); font-weight: 700; }
+
+.objective-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
+  background: #fff; border-radius: 14px; padding: 12px 18px; margin-bottom: 14px;
+  box-shadow: var(--shadow); border-left: 6px solid var(--primary);
+}
+.objective-bar .obj-goal { font-weight: 800; font-size: 1.05rem; }
+.objective-bar .obj-limit { font-weight: 700; background: #fff3e0; color: var(--primary-d); padding: 4px 12px; border-radius: 999px; }
+.objective-bar .obj-stars { font-weight: 700; color: #777; margin-left: auto; }
 
 .play-area {
   display: grid; grid-template-columns: minmax(280px, 1.2fr) 200px 1fr; gap: 18px; align-items: start;

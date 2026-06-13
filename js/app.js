@@ -183,6 +183,25 @@
     });
   }
 
+  // Crystal-clear objective + limitation banner for the current level.
+  function renderObjective(lvl) {
+    const bar = $("objectiveBar");
+    if (!bar) return;
+    const k = lvl.kind || "maze";
+    let limit;
+    if (k === "cargo") limit = `⚖ ≤ ${lvl.capacity} · 💰 ≥ ${lvl.target}`;
+    else if (k === "bus") limit = `🚏 × ${lvl.stops.length} · 🔴🟢🟡`;
+    else if (k === "ocean") limit = `🐟 × ${lvl.fish.length}`;
+    else if (k === "build") limit = `🎯 × ${lvl.target.length}`;
+    else limit = `🚩 × 1`;
+    const goal = `🎯 ${I18N.markup(levelGoal(lvl))}`;
+    const stars = `${I18N.markup(I18N.t("forStars"))}: ≤ ${lvl.optimal} 🧩`;
+    bar.innerHTML =
+      `<span class="obj-goal">${goal}</span>` +
+      `<span class="obj-limit">${escapeHtml(limit)}</span>` +
+      `<span class="obj-stars">${stars}</span>`;
+  }
+
   /* ---------- players ---------- */
   function openPlayersModal() {
     renderPlayers();
@@ -237,7 +256,7 @@
     playOrigin = origin || "menu";
     const num = lvl.isCustom ? "🎓" : lvl.id + ".";
     I18N.setText($("levelTitle"), `${num} ${levelName(lvl)}`);
-    I18N.setText($("levelGoal"), levelGoal(lvl));
+    renderObjective(lvl);
     Blocks.setAllowed(lvl.allowed);
     Engine.load(lvl);
     updateCounter(0);
@@ -254,12 +273,14 @@
       toast(I18N.t("programEmpty"));
       return;
     }
+    Sound.unlock();
     setRunEnabled(false);
     Engine.run(program, (result) => {
       if (result.win) {
         onWin();
       } else {
         setRunEnabled(true);
+        Sound.oops();
         toast(I18N.t(result.reason));
       }
     });
@@ -279,6 +300,7 @@
       if (i > -1 && i + 1 < currentPack.length) nextLevelRef = currentPack[i + 1];
     }
     $("nextLevelBtn").style.display = nextLevelRef ? "inline-block" : "none";
+    Sound.win();
     openModal("winModal");
     setRunEnabled(true);
   }
@@ -314,6 +336,7 @@
       b.addEventListener("click", () => I18N.setLang(b.dataset.lang)));
 
     $("howToBtn").addEventListener("click", () => { renderHowTo(); openModal("howToModal"); });
+    $("muteBtn").addEventListener("click", () => { Sound.unlock(); Sound.toggleMute(); updateMuteBtn(); });
     $("closeHowToBtn").addEventListener("click", () => closeModal("howToModal"));
 
     $("changeNameBtn").addEventListener("click", openPlayersModal);
@@ -354,7 +377,7 @@
       } else if ($("screen-play").classList.contains("active")) {
         const num = currentLevel.isCustom ? "🎓" : currentLevel.id + ".";
         I18N.setText($("levelTitle"), `${num} ${levelName(currentLevel)}`);
-        I18N.setText($("levelGoal"), levelGoal(currentLevel));
+        renderObjective(currentLevel);
         Blocks.relabel();
         updateCounter(Blocks.count());
       }
@@ -431,6 +454,10 @@
     });
   }
 
+  function updateMuteBtn() {
+    $("muteBtn").textContent = Sound.muted ? "🔇" : "🔊";
+  }
+
   function saveName() {
     const name = Store.setPlayer($("nameInput").value);
     closeModal("nameModal");
@@ -441,9 +468,11 @@
   /* ---------- boot ---------- */
   window.addEventListener("DOMContentLoaded", () => {
     I18N.init();
+    Sound.init();
     Engine.init($("stage"));
     Editor.init($("editorStage"));
     wire();
+    updateMuteBtn();
     if (!Store.getPlayer()) {
       $("nameInput").value = "";
       openModal("nameModal");

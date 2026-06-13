@@ -17,6 +17,7 @@
     <div class="topbar-controls">
       <button id="howToBtn" class="pill" data-i18n="howTo">How to play</button>
       <button id="teacherBtn" class="pill">🎓 <span data-i18n="teacher">Teacher</span></button>
+      <button id="muteBtn" class="pill" aria-label="sound">🔊</button>
       <div class="lang-switch" role="group" aria-label="Language">
         <button class="lang-btn" data-lang="en">EN</button>
         <button class="lang-btn" data-lang="zh-tw">中文</button>
@@ -72,8 +73,9 @@
     <div class="play-topline">
       <button id="backBtn" class="pill">⬅ <span data-i18n="back">Back</span></button>
       <h2 id="levelTitle">Level</h2>
-      <div class="goal-hint">🎯 <span id="levelGoal"></span></div>
     </div>
+
+    <div id="objectiveBar" class="objective-bar"></div>
 
     <div class="play-area">
       <!-- Stage -->
@@ -227,6 +229,7 @@
   </footer>
 
   <script src="js/zhuyin.js"></script>
+  <script src="js/sound.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/levels.js"></script>
   <script src="js/busLevels.js"></script>

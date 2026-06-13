@@ -63,6 +63,44 @@
       allowed: ["forward", "left", "right", "repeat"],
       optimal: 5, // Repeat 3 [ forward, turnRight, forward, turnLeft ]
     },
+
+    /* ---- Advanced (ages ~9–10) ---- */
+    {
+      id: 7, nameKey: "lvl7", goalKey: "lvl7goal",
+      cols: 6, rows: 6,
+      start: { x: 0, y: 5, dir: 0 },
+      goal: { x: 5, y: 0 },
+      walls: [],
+      allowed: ["forward", "left", "right", "repeat"],
+      optimal: 5, // Repeat5[fwd], right, Repeat5[fwd]
+    },
+    {
+      id: 8, nameKey: "lvl8", goalKey: "lvl8goal",
+      cols: 6, rows: 6,
+      start: { x: 0, y: 5, dir: 0 },
+      goal: { x: 4, y: 5 },
+      walls: [{ x: 2, y: 5 }, { x: 2, y: 4 }, { x: 2, y: 3 }, { x: 2, y: 2 }],
+      allowed: ["forward", "left", "right", "repeat"],
+      optimal: 8, // Repeat4[fwd], right, Repeat4[fwd], right, Repeat4[fwd]
+    },
+    {
+      id: 9, nameKey: "lvl9", goalKey: "lvl9goal",
+      cols: 6, rows: 6,
+      start: { x: 0, y: 0, dir: 2 },
+      goal: { x: 5, y: 5 },
+      walls: [],
+      allowed: ["forward", "left", "right", "repeat"],
+      optimal: 5, // Repeat5[ fwd, turnLeft, fwd, turnRight ]
+    },
+    {
+      id: 10, nameKey: "lvl10", goalKey: "lvl10goal",
+      cols: 7, rows: 7,
+      start: { x: 0, y: 6, dir: 0 },
+      goal: { x: 6, y: 6 },
+      walls: [{ x: 1, y: 6 }, { x: 2, y: 6 }, { x: 3, y: 6 }, { x: 4, y: 6 }, { x: 5, y: 6 }],
+      allowed: ["forward", "left", "right", "repeat"],
+      optimal: 8, // Repeat6[fwd], right, Repeat6[fwd], right, Repeat6[fwd]
+    },
   ];
 
   window.LEVELS = LEVELS;
