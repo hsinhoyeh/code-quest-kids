@@ -283,5 +283,29 @@ body {
 .zy-neu .zy-t { margin-bottom: -1px; }
 body.zh { line-height: 1.4; }
 
+/* ---------- math expression pad (repeat block) ---------- */
+.expr-toggle {
+  background: #ede7f6; color: #4a148c; border-radius: 8px;
+  font-size: 0.72rem; font-weight: 800; padding: 4px 8px; line-height: 1;
+}
+.expr-toggle.active { background: #7c4dff; color: #fff; }
+.expr-display {
+  min-width: 56px; height: 30px; background: #fff;
+  border: 2px solid #7c4dff; border-radius: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.88rem; color: #4a148c; padding: 0 8px;
+  letter-spacing: 1px;
+}
+.expr-btns {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+  padding: 6px 8px 4px; background: #f3e5f5; border-radius: 0 0 10px 10px;
+}
+.expr-btn {
+  padding: 6px 2px; font-size: 0.82rem; font-weight: 700;
+  border-radius: 7px; background: #ede7f6; color: #4a148c;
+  min-width: 0;
+}
+.expr-btn:active { background: #7c4dff; color: #fff; }
+
 /* ---------- footer ---------- */
 .footer { text-align: center; padding: 20px; color: #999; }

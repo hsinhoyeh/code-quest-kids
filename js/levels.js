@@ -64,7 +64,7 @@
       optimal: 5, // Repeat 3 [ forward, turnRight, forward, turnLeft ]
     },
 
-    /* ---- Advanced (ages ~9–10) ---- */
+    /* ---- Advanced (ages ~8–10) ---- */
     {
       id: 7, nameKey: "lvl7", goalKey: "lvl7goal",
       cols: 6, rows: 6,
@@ -100,6 +100,36 @@
       walls: [{ x: 1, y: 6 }, { x: 2, y: 6 }, { x: 3, y: 6 }, { x: 4, y: 6 }, { x: 5, y: 6 }],
       allowed: ["forward", "left", "right", "repeat"],
       optimal: 8, // Repeat6[fwd], right, Repeat6[fwd], right, Repeat6[fwd]
+    },
+
+    /* ---- Math levels (~age 8–10): introduces math expressions in Repeat ---- */
+    {
+      id: 11, nameKey: "lvl11", goalKey: "lvl11goal",
+      cols: 7, rows: 7,
+      start: { x: 0, y: 6, dir: 1 }, // bottom-left, facing right
+      goal:  { x: 6, y: 0 },          // top-right
+      // Two horizontal barriers (gap only at x=3) force path: right 3 → up 6 → right 3
+      // Hint: 3 = 1+2  and  6 = 3+3
+      walls: [
+        {x:0,y:5},{x:1,y:5},{x:2,y:5},{x:4,y:5},{x:5,y:5},{x:6,y:5},
+        {x:0,y:1},{x:1,y:1},{x:2,y:1},{x:4,y:1},{x:5,y:1},{x:6,y:1},
+      ],
+      allowed: ["forward", "left", "right", "repeat"],
+      optimal: 8, // repeat(3)[fwd] + left + repeat(6)[fwd] + right + repeat(3)[fwd]
+    },
+    {
+      id: 12, nameKey: "lvl12", goalKey: "lvl12goal",
+      cols: 8, rows: 8,
+      start: { x: 0, y: 7, dir: 1 }, // bottom-left, facing right
+      goal:  { x: 7, y: 1 },          // near top-right
+      // Horizontal barrier at y=4 (gap at x=6) + right-column wall force: right 6 → up 6 → right 1
+      // Hint: 6 = 2×3
+      walls: [
+        {x:0,y:4},{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4},{x:5,y:4},
+        {x:7,y:2},{x:7,y:3},{x:7,y:4},{x:7,y:5},{x:7,y:6},{x:7,y:7},
+      ],
+      allowed: ["forward", "left", "right", "repeat"],
+      optimal: 7, // repeat(6)[fwd] + left + repeat(6)[fwd] + right + forward
     },
   ];
 

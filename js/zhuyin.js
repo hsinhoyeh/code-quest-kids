@@ -75,6 +75,9 @@
     // Advanced levels
     "往": "ㄨㄤˇ", "道": "ㄉㄠˋ", "階": "ㄐㄧㄝ", "梯": "ㄊㄧ", "爬": "ㄆㄚˊ",
     "樓": "ㄌㄡˊ",
+    // Math levels & expression mode
+    "雙": "ㄕㄨㄤ", "乘": "ㄔㄥˊ", "法": "ㄈㄚˇ", "快": "ㄎㄨㄞˋ",
+    "廊": "ㄌㄤˊ", "算": "ㄙㄨㄢˋ", "或": "ㄏㄨㄛˋ", "切": "ㄑㄧㄝ",
   };
 
   // Multi-character overrides for context-dependent (polyphone) readings.

@@ -292,6 +292,19 @@
       drawRow(b, this.canvas.height / 2 + 46, true);
     },
 
+    // Safely evaluate a math expression containing only digits and + - * ( ) spaces.
+    _evalExpr(str) {
+      if (typeof str !== "string" || !/^[\d\s\+\-\*\(\)]+$/.test(str)) return 1;
+      try {
+        // eslint-disable-next-line no-new-func
+        const result = new Function('"use strict"; return (' + str + ")")();
+        if (typeof result !== "number" || !isFinite(result)) return 1;
+        return Math.max(1, Math.min(20, Math.floor(result)));
+      } catch (e) {
+        return 1;
+      }
+    },
+
     // program = tree of nodes; expand into primitive commands.
     _flatten(nodes) {
       const out = [];
@@ -300,7 +313,9 @@
         for (const n of list) {
           if (out.length > MAX) return;
           if (n.type === "repeat") {
-            const count = Math.max(1, Math.min(20, n.count || 1));
+            const count = n.countExpr
+              ? this._evalExpr(n.countExpr)
+              : Math.max(1, Math.min(20, n.count || 1));
             for (let i = 0; i < count; i++) walk(n.children || []);
           } else {
             out.push(n.type);

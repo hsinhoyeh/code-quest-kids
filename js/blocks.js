@@ -115,15 +115,6 @@
       head.className = "repeat-head";
       head.innerHTML = `<span class="blk-icon">🔁</span><span>${I18N.markup(I18N.t("blockRepeat"))}</span>`;
 
-      const stepper = document.createElement("div");
-      stepper.className = "stepper";
-      const minus = mkBtn("−", () => { node.count = Math.max(1, node.count - 1); this.render(); });
-      const num = document.createElement("span");
-      num.className = "step-num";
-      num.textContent = node.count;
-      const plus = mkBtn("+", () => { node.count = Math.min(10, node.count + 1); this.render(); });
-      stepper.append(minus, num, plus);
-
       const times = document.createElement("span");
       times.className = "times-label";
       I18N.setText(times, I18N.t("blockTimes"));
@@ -139,7 +130,56 @@
         this.render();
       });
 
-      head.append(stepper, times, del);
+      // Toggle between plain number and math-expression mode.
+      const exprToggle = mkBtn(node.exprMode ? "123" : "fx", () => {
+        node.exprMode = !node.exprMode;
+        if (!node.exprMode) delete node.countExpr;
+        this.render();
+      });
+      exprToggle.className = "step-btn expr-toggle" + (node.exprMode ? " active" : "");
+      exprToggle.title = node.exprMode ? I18N.t("numToggle") : I18N.t("exprToggle");
+
+      if (node.exprMode) {
+        // Expression display + key pad
+        const display = document.createElement("span");
+        display.className = "expr-display";
+        display.textContent = node.countExpr
+          ? node.countExpr.replace(/\*/g, "×")
+          : "?";
+
+        head.append(exprToggle, display, times, del);
+
+        const pad = document.createElement("div");
+        pad.className = "expr-btns";
+        ["1","2","3","4","5","6","7","8","9","0","+","−","×","⌫"].forEach((ch) => {
+          const b = mkBtn(ch, () => {
+            if (ch === "⌫") {
+              node.countExpr = (node.countExpr || "").slice(0, -1) || null;
+            } else {
+              const val = ch === "×" ? "*" : ch === "−" ? "-" : ch;
+              node.countExpr = (node.countExpr || "") + val;
+            }
+            this.render();
+          });
+          b.className = "step-btn expr-btn";
+          pad.appendChild(b);
+        });
+
+        wrap.append(head, pad);
+      } else {
+        const stepper = document.createElement("div");
+        stepper.className = "stepper";
+        const minus = mkBtn("−", () => { node.count = Math.max(1, node.count - 1); this.render(); });
+        const num = document.createElement("span");
+        num.className = "step-num";
+        num.textContent = node.count;
+        const plus = mkBtn("+", () => { node.count = Math.min(10, node.count + 1); this.render(); });
+        stepper.append(minus, num, plus);
+
+        head.append(stepper, exprToggle, times, del);
+        wrap.append(head);
+      }
+
       head.addEventListener("click", () => {
         this.activeRepeat = this.activeRepeat === node ? null : node;
         this.render();
@@ -156,7 +196,7 @@
         node.children.forEach((c) => body.appendChild(this._chip(c, node.children)));
       }
 
-      wrap.append(head, body);
+      wrap.appendChild(body);
       return wrap;
     },
 
