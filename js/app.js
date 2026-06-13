@@ -43,8 +43,33 @@
     $("playerNameDisplay").textContent = Store.getPlayer() || "—";
     renderLevelGrid();
     renderBusGrid();
+    renderBuildGrid();
     renderCustomGrid();
     renderLeaderboard();
+  }
+
+  // Shared renderer for a themed pack (bus, build) into a grid element.
+  function renderPackGrid(pack, gridId, badge) {
+    const grid = $(gridId);
+    if (!grid || !pack) return;
+    grid.innerHTML = "";
+    pack.forEach((lvl, idx) => {
+      const unlocked = unlockedIn(pack, lvl);
+      const res = Store.levelResult(lvl.id);
+      const card = document.createElement("button");
+      card.className = "level-card" + (unlocked ? "" : " locked");
+      const stars = res ? "⭐".repeat(res.stars) + "☆".repeat(3 - res.stars) : "☆☆☆";
+      card.innerHTML = `
+        <div class="level-num">${badge}${idx + 1}</div>
+        <div class="level-name">${I18N.markup(levelName(lvl))}</div>
+        <div class="level-stars">${unlocked ? stars : "🔒"}</div>`;
+      if (unlocked) card.addEventListener("click", () => startLevel(lvl, "menu", pack));
+      else card.title = I18N.t("locked");
+      grid.appendChild(card);
+    });
+  }
+  function renderBuildGrid() {
+    if (typeof BUILD_LEVELS !== "undefined") renderPackGrid(BUILD_LEVELS, "buildGrid", "🛠️");
   }
 
   function renderLevelGrid() {
@@ -70,23 +95,7 @@
   }
 
   function renderBusGrid() {
-    const grid = $("busGrid");
-    if (!grid || typeof BUS_LEVELS === "undefined") return;
-    grid.innerHTML = "";
-    BUS_LEVELS.forEach((lvl, idx) => {
-      const unlocked = unlockedIn(BUS_LEVELS, lvl);
-      const res = Store.levelResult(lvl.id);
-      const card = document.createElement("button");
-      card.className = "level-card" + (unlocked ? "" : " locked");
-      const stars = res ? "⭐".repeat(res.stars) + "☆".repeat(3 - res.stars) : "☆☆☆";
-      card.innerHTML = `
-        <div class="level-num">🚌${idx + 1}</div>
-        <div class="level-name">${I18N.markup(levelName(lvl))}</div>
-        <div class="level-stars">${unlocked ? stars : "🔒"}</div>`;
-      if (unlocked) card.addEventListener("click", () => startLevel(lvl, "menu", BUS_LEVELS));
-      else card.title = I18N.t("locked");
-      grid.appendChild(card);
-    });
+    if (typeof BUS_LEVELS !== "undefined") renderPackGrid(BUS_LEVELS, "busGrid", "🚌");
   }
 
   function renderCustomGrid() {

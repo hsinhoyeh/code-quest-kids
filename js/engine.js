@@ -9,6 +9,12 @@
 
   const COLORS = { red: "#e53935", green: "#43c463", yellow: "#fdd835" };
 
+  const PART_ICON = {
+    frame: "🟧", wheel: "🛞", body: "🚙", window: "🪟",
+    wing: "🪽", engine: "🔧", nose: "🔺", booster: "🔥",
+  };
+  const PARTS = new Set(Object.keys(PART_ICON));
+
   const Engine = {
     canvas: null,
     ctx: null,
@@ -27,19 +33,22 @@
     load(level) {
       this.level = level;
       this.mode = level.kind || "maze";
-      this.robot = { x: level.start.x, y: level.start.y, dir: level.start.dir };
+      const s = level.start || { x: 0, y: 0, dir: 0 };
+      this.robot = { x: s.x, y: s.y, dir: s.dir };
       this.led = null;
       this.served = new Set();
-      this._computeLayout();
+      this.built = [];
+      if (this.mode !== "build") this._computeLayout();
       this.draw();
     },
 
     reset() {
       if (!this.level) return;
-      const s = this.level.start;
+      const s = this.level.start || { x: 0, y: 0, dir: 0 };
       this.robot = { x: s.x, y: s.y, dir: s.dir };
       this.led = null;
       this.served = new Set();
+      this.built = [];
       this.draw();
     },
 
@@ -59,6 +68,8 @@
     draw() {
       const ctx = this.ctx, L = this.level, c = this.cell;
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+      if (this.mode === "build") { this._drawBuild(); return; }
 
       const bus = this.mode === "bus";
       // cells
@@ -168,6 +179,51 @@
       ctx.fillText("🤖", px, py + 2);
     },
 
+    _drawBuild() {
+      const ctx = this.ctx, W = this.canvas.width;
+      const t = this.level.target, b = this.built;
+      ctx.fillStyle = "#fff8e1";
+      ctx.fillRect(0, 0, W, this.canvas.height);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const maxN = Math.max(t.length, b.length, 1);
+      const pad = 24;
+      const box = Math.min(86, Math.floor((W - 2 * pad) / maxN));
+      const gap = Math.floor(box * 0.12);
+
+      const drawRow = (arr, cy, colorize) => {
+        const totalW = arr.length * box;
+        const startX = (W - totalW) / 2;
+        for (let i = 0; i < arr.length; i++) {
+          const x = startX + i * box;
+          let fill = "#ffffff", stroke = "#bdbdbd";
+          if (colorize) {
+            const ok = i < t.length && arr[i] === t[i];
+            fill = ok ? "#c8e6c9" : "#ffcdd2";
+            stroke = ok ? "#43c463" : "#e53935";
+          }
+          ctx.fillStyle = fill; ctx.strokeStyle = stroke; ctx.lineWidth = 4;
+          roundRect(ctx, x + gap / 2, cy, box - gap, box - gap, 12);
+          ctx.fill(); ctx.stroke();
+          ctx.font = `${Math.floor(box * 0.5)}px serif`;
+          ctx.fillStyle = "#000";
+          ctx.fillText(PART_ICON[arr[i]] || "?", x + box / 2, cy + (box - gap) / 2 + 2);
+        }
+      };
+
+      // target (goal) row
+      ctx.font = `${Math.floor(box * 0.42)}px serif`;
+      ctx.fillStyle = "#000";
+      ctx.fillText("🎯", W / 2, 36);
+      drawRow(t, 56, false);
+
+      // built row
+      ctx.font = `${Math.floor(box * 0.42)}px serif`;
+      ctx.fillText("🛠️", W / 2, this.canvas.height / 2 + 26);
+      drawRow(b, this.canvas.height / 2 + 46, true);
+    },
+
     // program = tree of nodes; expand into primitive commands.
     _flatten(nodes) {
       const out = [];
@@ -195,20 +251,25 @@
       let i = 0;
 
       const bus = this.mode === "bus";
+      const build = this.mode === "build";
       const won = () =>
-        bus ? this.served.size === this.level.stops.length
-            : this.robot.x === this.level.goal.x && this.robot.y === this.level.goal.y;
+        build ? this.built.length === this.level.target.length
+        : bus ? this.served.size === this.level.stops.length
+        : this.robot.x === this.level.goal.x && this.robot.y === this.level.goal.y;
+      const endReason = build ? "buildMissed" : bus ? "busMissed" : "missedGoal";
 
       const step = () => {
         if (i >= cmds.length) {
           this.running = false;
-          onDone(won() ? { win: true } : { win: false, reason: bus ? "busMissed" : "missedGoal" });
+          onDone(won() ? { win: true } : { win: false, reason: endReason });
           return;
         }
         const cmd = cmds[i++];
         let moved = false;
 
-        if (cmd === "left") {
+        if (build && PARTS.has(cmd)) {
+          this.built.push(cmd);
+        } else if (cmd === "left") {
           this.robot.dir = (this.robot.dir + 3) % 4;
         } else if (cmd === "right") {
           this.robot.dir = (this.robot.dir + 1) % 4;
@@ -228,6 +289,17 @@
           moved = true;
         }
         this.draw();
+
+        // build: each part must match the target recipe in order
+        if (build && PARTS.has(cmd)) {
+          const idx = this.built.length - 1;
+          if (idx >= this.level.target.length || this.built[idx] !== this.level.target[idx]) {
+            this.running = false;
+            this._flash("#ff5252");
+            onDone({ win: false, reason: "wrongPart" });
+            return;
+          }
+        }
 
         // bus: arriving at a stop requires the matching LED colour
         if (bus && moved) {

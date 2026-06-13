@@ -148,6 +148,7 @@ body {
 .light-red { background: #ef9a9a; }
 .light-green { background: #a5d6a7; }
 .light-yellow { background: #fff59d; }
+.blk-part { background: #26a69a; }
 
 .program { min-height: 160px; display: flex; flex-direction: column; gap: 8px; }
 .chip { position: relative; cursor: default; padding-right: 36px; }

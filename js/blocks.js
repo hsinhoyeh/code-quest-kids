@@ -9,6 +9,13 @@
     red: { icon: "🔴", labelKey: "lightRed", cls: "blk-light light-red" },
     green: { icon: "🟢", labelKey: "lightGreen", cls: "blk-light light-green" },
     yellow: { icon: "🟡", labelKey: "lightYellow", cls: "blk-light light-yellow" },
+    frame: { icon: "🟧", labelKey: "partFrame", cls: "blk-part" },
+    wheel: { icon: "🛞", labelKey: "partWheel", cls: "blk-part" },
+    body: { icon: "🚙", labelKey: "partBody", cls: "blk-part" },
+    window: { icon: "🪟", labelKey: "partWindow", cls: "blk-part" },
+    wing: { icon: "🪽", labelKey: "partWing", cls: "blk-part" },
+    nose: { icon: "🔺", labelKey: "partNose", cls: "blk-part" },
+    booster: { icon: "🔥", labelKey: "partBooster", cls: "blk-part" },
   };
 
   const Blocks = {

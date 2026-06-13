@@ -112,6 +112,17 @@
       addPlayer: "Add & start fresh",
       nowTag: "now",
       confirmDeletePlayer: "Delete this player and their scores?",
+      // Build It! pack
+      buildPack: "Build It!",
+      v1: "Two Wheels", v1goal: "Add two wheels 🛞",
+      v2: "Little Car", v2goal: "Build the car in the right order",
+      v3: "Four Wheels", v3goal: "Use Repeat to add 4 wheels",
+      v4: "Airplane", v4goal: "Assemble the airplane",
+      v5: "Rocket", v5goal: "Build the rocket with a loop",
+      partFrame: "Frame", partWheel: "Wheel", partBody: "Body", partWindow: "Window",
+      partWing: "Wing", partNose: "Nose", partBooster: "Booster",
+      wrongPart: "That part doesn't fit here! Check the order 💪",
+      buildMissed: "Not finished — match the target! 💪",
     },
     "zh-tw": {
       appTitle: "程式冒險小高手",
@@ -221,6 +232,17 @@
       addPlayer: "新增並重新開始",
       nowTag: "目前",
       confirmDeletePlayer: "要刪除這位玩家和他的分數嗎？",
+      // Build It! pack
+      buildPack: "組裝工廠",
+      v1: "兩個輪子", v1goal: "裝上兩個輪子 🛞",
+      v2: "小汽車", v2goal: "照順序組好汽車",
+      v3: "四個輪子", v3goal: "用重複裝四個輪子",
+      v4: "小飛機", v4goal: "組好一架飛機",
+      v5: "火箭", v5goal: "用迴圈組好火箭",
+      partFrame: "車架", partWheel: "輪子", partBody: "車身", partWindow: "車窗",
+      partWing: "機翼", partNose: "機鼻", partBooster: "推進器",
+      wrongPart: "這個零件放錯了！檢查順序 💪",
+      buildMissed: "還沒組好 — 照著目標做！💪",
     },
   };
 
