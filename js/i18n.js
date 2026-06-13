@@ -126,7 +126,9 @@
       busMissed: "Some stops still need the bus! Try again 💪",
       // Players
       players: "Players",
+      switchPlayer: "Switch Player",
       addPlayer: "Add & start fresh",
+      passToFriend: "Pass to friend 👤",
       nowTag: "now",
       confirmDeletePlayer: "Delete this player and their scores?",
       // Build It! pack
@@ -281,7 +283,9 @@
       busMissed: "還有站沒載到客人！再試一次 💪",
       // Players
       players: "玩家",
+      switchPlayer: "換玩家",
       addPlayer: "新增並重新開始",
+      passToFriend: "換朋友玩 👤",
       nowTag: "目前",
       confirmDeletePlayer: "要刪除這位玩家和他的分數嗎？",
       // Build It! pack

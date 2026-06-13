@@ -222,6 +222,7 @@
       pick.innerHTML = `<span class="p-name">${I18N.markup(name)}</span><span class="p-stars">${Store.starsFor(name)}⭐</span>${tag}`;
       pick.addEventListener("click", () => {
         Store.setPlayer(name);
+        updateTopbarPlayer();
         closeModal("playersModal");
         renderMenu();
       });
@@ -244,7 +245,8 @@
   function addPlayer() {
     const name = $("newPlayerInput").value.trim();
     if (!name) return;
-    Store.setPlayer(name); // creates a fresh player with empty progress
+    Store.setPlayer(name);
+    updateTopbarPlayer();
     closeModal("playersModal");
     renderMenu();
   }
@@ -339,12 +341,14 @@
     $("muteBtn").addEventListener("click", () => { Sound.unlock(); Sound.toggleMute(); updateMuteBtn(); });
     $("closeHowToBtn").addEventListener("click", () => closeModal("howToModal"));
 
+    $("switchPlayerBtn").addEventListener("click", openPlayersModal);
     $("changeNameBtn").addEventListener("click", openPlayersModal);
     $("saveNameBtn").addEventListener("click", saveName);
     $("nameInput").addEventListener("keydown", (e) => { if (e.key === "Enter") saveName(); });
     $("addPlayerBtn").addEventListener("click", addPlayer);
     $("newPlayerInput").addEventListener("keydown", (e) => { if (e.key === "Enter") addPlayer(); });
     $("closePlayersBtn").addEventListener("click", () => closeModal("playersModal"));
+    $("passToFriendBtn").addEventListener("click", () => { closeModal("winModal"); openPlayersModal(); });
 
     $("backBtn").addEventListener("click", () => {
       if (playOrigin === "editor") { show("screen-editor"); Editor.render(); }
@@ -372,6 +376,7 @@
     wireEditor();
 
     I18N.onChange(() => {
+      updateTopbarPlayer();
       if ($("screen-menu").classList.contains("active")) {
         renderMenu();
       } else if ($("screen-play").classList.contains("active")) {
@@ -458,10 +463,17 @@
     $("muteBtn").textContent = Sound.muted ? "🔇" : "🔊";
   }
 
+  function updateTopbarPlayer() {
+    const name = Store.getPlayer();
+    $("topbarPlayer").textContent = name || "—";
+    $("switchPlayerBtn").title = I18N.t("switchPlayer");
+  }
+
   function saveName() {
     const name = Store.setPlayer($("nameInput").value);
     closeModal("nameModal");
     $("playerNameDisplay").textContent = name;
+    updateTopbarPlayer();
     renderMenu();
   }
 
@@ -473,6 +485,7 @@
     Editor.init($("editorStage"));
     wire();
     updateMuteBtn();
+    updateTopbarPlayer();
     if (!Store.getPlayer()) {
       $("nameInput").value = "";
       openModal("nameModal");
