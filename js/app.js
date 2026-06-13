@@ -147,6 +147,53 @@
     });
   }
 
+  /* ---------- players ---------- */
+  function openPlayersModal() {
+    renderPlayers();
+    $("newPlayerInput").value = "";
+    openModal("playersModal");
+  }
+
+  function renderPlayers() {
+    const ul = $("playersList");
+    ul.innerHTML = "";
+    const cur = Store.getPlayer();
+    Store.getPlayers().forEach((name) => {
+      const li = document.createElement("li");
+      li.className = "player-row" + (name === cur ? " current" : "");
+      const tag = name === cur ? ` <span class="now-tag">(${I18N.markup(I18N.t("nowTag"))})</span>` : "";
+      const pick = document.createElement("button");
+      pick.className = "player-pick";
+      pick.innerHTML = `<span class="p-name">${I18N.markup(name)}</span><span class="p-stars">${Store.starsFor(name)}⭐</span>${tag}`;
+      pick.addEventListener("click", () => {
+        Store.setPlayer(name);
+        closeModal("playersModal");
+        renderMenu();
+      });
+      const del = document.createElement("button");
+      del.className = "chip-x";
+      del.textContent = "×";
+      del.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (confirm(I18N.t("confirmDeletePlayer"))) {
+          Store.deletePlayer(name);
+          renderPlayers();
+          renderMenu();
+        }
+      });
+      li.append(pick, del);
+      ul.appendChild(li);
+    });
+  }
+
+  function addPlayer() {
+    const name = $("newPlayerInput").value.trim();
+    if (!name) return;
+    Store.setPlayer(name); // creates a fresh player with empty progress
+    closeModal("playersModal");
+    renderMenu();
+  }
+
   /* ---------- play ---------- */
   function startLevel(lvl, origin, pack) {
     currentLevel = lvl;
@@ -233,13 +280,12 @@
     $("howToBtn").addEventListener("click", () => openModal("howToModal"));
     $("closeHowToBtn").addEventListener("click", () => closeModal("howToModal"));
 
-    $("changeNameBtn").addEventListener("click", () => {
-      $("nameInput").value = Store.getPlayer();
-      openModal("nameModal");
-      $("nameInput").focus();
-    });
+    $("changeNameBtn").addEventListener("click", openPlayersModal);
     $("saveNameBtn").addEventListener("click", saveName);
     $("nameInput").addEventListener("keydown", (e) => { if (e.key === "Enter") saveName(); });
+    $("addPlayerBtn").addEventListener("click", addPlayer);
+    $("newPlayerInput").addEventListener("keydown", (e) => { if (e.key === "Enter") addPlayer(); });
+    $("closePlayersBtn").addEventListener("click", () => closeModal("playersModal"));
 
     $("backBtn").addEventListener("click", () => {
       if (playOrigin === "editor") { show("screen-editor"); Editor.render(); }

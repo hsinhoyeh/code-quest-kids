@@ -70,6 +70,20 @@
       return Object.values(p.levels).reduce((s, l) => s + l.stars, 0);
     },
 
+    /* ---- player management ---- */
+    getPlayers() {
+      return Object.keys(load().players);
+    },
+    deletePlayer(name) {
+      const data = load();
+      delete data.players[name];
+      save(data);
+      if (this.getPlayer() === name) {
+        const rest = Object.keys(data.players);
+        localStorage.setItem(KEY_PLAYER, rest[0] || "");
+      }
+    },
+
     /* ---- teacher-made custom quests ---- */
     getCustom() {
       try {

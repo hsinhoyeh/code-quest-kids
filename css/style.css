@@ -241,6 +241,22 @@ body {
 .editor-panel .run-controls { display: none; }
 .editor-area .stage-wrap .run-controls { display: flex; }
 
+/* ---------- players modal ---------- */
+.players-list { list-style: none; margin: 0 0 16px; padding: 0; display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; }
+.player-row { display: flex; align-items: center; gap: 8px; }
+.player-pick {
+  flex: 1; display: flex; align-items: center; gap: 10px; border: 2px solid #eceff1;
+  background: #fafafa; border-radius: 12px; padding: 10px 14px; cursor: pointer; font: inherit;
+  font-weight: 700; text-align: left;
+}
+.player-row.current .player-pick { border-color: var(--primary); background: #fff3e0; }
+.player-pick .p-name { flex: 1; }
+.player-pick .p-stars { color: #fbc02d; }
+.now-tag { color: var(--primary-d); font-size: .85rem; }
+.new-player-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.new-player-row input { flex: 1; margin-bottom: 0; }
+.new-player-row .btn-run { white-space: nowrap; padding: 12px 16px; font-size: 1rem; }
+
 /* ---------- zhuyin (注音) ruby ---------- */
 ruby { ruby-position: over; ruby-align: center; }
 rt {

@@ -107,6 +107,11 @@
       lightRed: "Light: Red", lightGreen: "Light: Green", lightYellow: "Light: Yellow",
       wrongColor: "Wrong light! Set the right colour before the stop 💪",
       busMissed: "Some stops still need the bus! Try again 💪",
+      // Players
+      players: "Players",
+      addPlayer: "Add & start fresh",
+      nowTag: "now",
+      confirmDeletePlayer: "Delete this player and their scores?",
     },
     "zh-tw": {
       appTitle: "程式冒險小高手",
@@ -211,6 +216,11 @@
       lightRed: "紅燈", lightGreen: "綠燈", lightYellow: "黃燈",
       wrongColor: "燈號不對！到站前先換對顏色 💪",
       busMissed: "還有站沒載到客人！再試一次 💪",
+      // Players
+      players: "玩家",
+      addPlayer: "新增並重新開始",
+      nowTag: "目前",
+      confirmDeletePlayer: "要刪除這位玩家和他的分數嗎？",
     },
   };
 
