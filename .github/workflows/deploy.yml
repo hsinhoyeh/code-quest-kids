@@ -26,6 +26,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          # Create/enable the Pages site automatically so no manual
+          # Settings toggle is needed (uses the workflow's pages: write token).
+          enablement: true
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
