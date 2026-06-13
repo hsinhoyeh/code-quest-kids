@@ -89,9 +89,22 @@
     const c = ch.codePointAt(0);
     return c >= 0x4e00 && c <= 0x9fff;
   }
-  // Bopomofo to the RIGHT of the character, stacked vertically (textbook style).
+  // Bopomofo to the RIGHT of the character. Symbols stack vertically; the tone
+  // mark sits BESIDE the column (2nd/3rd/4th to the right, neutral ˙ on top).
+  const TONE_MARKS = { "ˊ": 1, "ˇ": 1, "ˋ": 1, "˙": 1 };
   function ruby(ch, zh) {
-    return `<span class="zy"><span class="zy-c">${esc(ch)}</span><span class="zy-b">${esc(zh)}</span></span>`;
+    let base = zh, tone = "", neutral = false;
+    if (zh[0] === "˙") { neutral = true; tone = "˙"; base = zh.slice(1); }
+    else {
+      const last = zh[zh.length - 1];
+      if (TONE_MARKS[last]) { tone = last; base = zh.slice(0, -1); }
+    }
+    const baseSpan = `<span class="zy-b">${esc(base)}</span>`;
+    let cluster;
+    if (neutral) cluster = `<span class="zy-z zy-neu"><span class="zy-t">${esc(tone)}</span>${baseSpan}</span>`;
+    else if (tone) cluster = `<span class="zy-z">${baseSpan}<span class="zy-t">${esc(tone)}</span></span>`;
+    else cluster = `<span class="zy-z">${baseSpan}</span>`;
+    return `<span class="zy"><span class="zy-c">${esc(ch)}</span>${cluster}</span>`;
   }
 
   function annotate(str) {

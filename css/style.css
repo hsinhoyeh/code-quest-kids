@@ -258,15 +258,21 @@ body {
 .new-player-row input { flex: 1; margin-bottom: 0; }
 .new-player-row .btn-run { white-space: nowrap; padding: 12px 16px; font-size: 1rem; }
 
-/* ---------- zhuyin (注音): vertical, to the right of each character ---------- */
-.zy { display: inline-flex; align-items: flex-start; line-height: 1.05; vertical-align: middle; }
+/* ---------- zhuyin (注音): vertical column right of the char; tone mark beside ---------- */
+.zy { display: inline-flex; align-items: center; line-height: 1; vertical-align: middle; }
 .zy-c { display: inline-block; }
+.zy-z { display: inline-flex; align-items: center; margin-left: 1px; }
+.zy-z.zy-neu { flex-direction: column; align-items: center; }
 .zy-b {
   writing-mode: vertical-lr; text-orientation: upright;
   font-size: 0.4em; font-weight: 700; color: #d84315;
-  margin-left: 1px; line-height: 0.95; letter-spacing: -0.5px;
-  user-select: none; align-self: flex-start;
+  line-height: 0.92; letter-spacing: -0.5px; user-select: none;
 }
+.zy-t {
+  font-size: 0.34em; font-weight: 700; color: #d84315;
+  line-height: 1; user-select: none;
+}
+.zy-neu .zy-t { margin-bottom: -1px; }
 body.zh { line-height: 1.4; }
 
 /* ---------- footer ---------- */
