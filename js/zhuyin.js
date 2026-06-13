@@ -69,8 +69,9 @@
     const c = ch.codePointAt(0);
     return c >= 0x4e00 && c <= 0x9fff;
   }
+  // Bopomofo to the RIGHT of the character, stacked vertically (textbook style).
   function ruby(ch, zh) {
-    return `<ruby>${esc(ch)}<rt>${esc(zh)}</rt></ruby>`;
+    return `<span class="zy"><span class="zy-c">${esc(ch)}</span><span class="zy-b">${esc(zh)}</span></span>`;
   }
 
   function annotate(str) {

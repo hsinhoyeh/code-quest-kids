@@ -257,18 +257,16 @@ body {
 .new-player-row input { flex: 1; margin-bottom: 0; }
 .new-player-row .btn-run { white-space: nowrap; padding: 12px 16px; font-size: 1rem; }
 
-/* ---------- zhuyin (注音) ruby ---------- */
-ruby { ruby-position: over; ruby-align: center; }
-rt {
-  font-size: 0.5em; color: #d84315; font-weight: 700;
-  line-height: 1; letter-spacing: 0; user-select: none;
+/* ---------- zhuyin (注音): vertical, to the right of each character ---------- */
+.zy { display: inline-flex; align-items: flex-start; line-height: 1.05; vertical-align: middle; }
+.zy-c { display: inline-block; }
+.zy-b {
+  writing-mode: vertical-lr; text-orientation: upright;
+  font-size: 0.4em; font-weight: 700; color: #d84315;
+  margin-left: 1px; line-height: 0.95; letter-spacing: -0.5px;
+  user-select: none; align-self: flex-start;
 }
-/* give annotated text breathing room so zhuyin doesn't clip */
-body.zh { line-height: 1.7; }
-body.zh .block, body.zh .chip, body.zh .pill, body.zh .btn-run,
-body.zh .btn-secondary, body.zh .tool-btn, body.zh .level-name,
-body.zh .lb-name { line-height: 1.6; }
-body.zh .brand h1, body.zh .hero h2 { line-height: 1.7; }
+body.zh { line-height: 1.4; }
 
 /* ---------- footer ---------- */
 .footer { text-align: center; padding: 20px; color: #999; }
