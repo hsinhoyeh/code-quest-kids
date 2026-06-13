@@ -72,10 +72,12 @@
       if (this.mode === "build") { this._drawBuild(); return; }
 
       const bus = this.mode === "bus";
+      const ocean = this.mode === "ocean";
       // cells
       for (let y = 0; y < L.rows; y++) {
         for (let x = 0; x < L.cols; x++) {
           if (bus) ctx.fillStyle = (x + y) % 2 === 0 ? "#d7d7d7" : "#cccccc";
+          else if (ocean) ctx.fillStyle = (x + y) % 2 === 0 ? "#81d4fa" : "#4fc3f7";
           else ctx.fillStyle = (x + y) % 2 === 0 ? "#eaf6ff" : "#d8eefc";
           ctx.fillRect(this._cx(x), this._cy(y), c, c);
         }
@@ -100,14 +102,21 @@
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       L.walls.forEach((w) => {
-        ctx.fillStyle = bus ? "#90a4ae" : "#8d6e63";
+        ctx.fillStyle = ocean ? "#ef9a9a" : bus ? "#90a4ae" : "#8d6e63";
         roundRect(ctx, this._cx(w.x) + 4, this._cy(w.y) + 4, c - 8, c - 8, 8);
         ctx.fill();
         ctx.font = `${Math.floor(c * 0.5)}px serif`;
-        ctx.fillText(bus ? "🏢" : "🧱", this._cx(w.x) + c / 2, this._cy(w.y) + c / 2 + 2);
+        ctx.fillText(ocean ? "🪸" : bus ? "🏢" : "🧱", this._cx(w.x) + c / 2, this._cy(w.y) + c / 2 + 2);
       });
 
-      if (bus) {
+      if (ocean) {
+        (L.fish || []).forEach((f) => {
+          if (this.served.has(this._stopKey(f))) return; // eaten
+          ctx.font = `${Math.floor(c * 0.6)}px serif`;
+          ctx.fillText("🐟", this._cx(f.x) + c / 2, this._cy(f.y) + c / 2 + 2);
+        });
+        this._drawActor("🐋", "#0277bd");
+      } else if (bus) {
         // bus stops with required colour
         (L.stops || []).forEach((s) => {
           const served = this.served.has(this._stopKey(s));
@@ -126,6 +135,21 @@
         ctx.fillText("🚩", this._cx(L.goal.x) + c / 2, this._cy(L.goal.y) + c / 2 + 2);
         this._drawRobot();
       }
+    },
+
+    _drawActor(emoji, color) {
+      const ctx = this.ctx, c = this.cell, r = this.robot;
+      const px = this._cx(r.x) + c / 2, py = this._cy(r.y) + c / 2;
+      const [dx, dy] = DIRS[r.dir];
+      ctx.fillStyle = color; ctx.beginPath();
+      const a = c * 0.34, ang = Math.atan2(dy, dx), bw = c * 0.15;
+      ctx.moveTo(px + dx * a, py + dy * a);
+      ctx.lineTo(px + Math.cos(ang + Math.PI / 2) * bw - dx * a * 0.4, py + Math.sin(ang + Math.PI / 2) * bw - dy * a * 0.4);
+      ctx.lineTo(px + Math.cos(ang - Math.PI / 2) * bw - dx * a * 0.4, py + Math.sin(ang - Math.PI / 2) * bw - dy * a * 0.4);
+      ctx.closePath(); ctx.fill();
+      ctx.font = `${Math.floor(c * 0.55)}px serif`;
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText(emoji, px, py + 2);
     },
 
     _drawBus() {
@@ -252,11 +276,13 @@
 
       const bus = this.mode === "bus";
       const build = this.mode === "build";
+      const ocean = this.mode === "ocean";
       const won = () =>
         build ? this.built.length === this.level.target.length
         : bus ? this.served.size === this.level.stops.length
+        : ocean ? this.served.size === this.level.fish.length
         : this.robot.x === this.level.goal.x && this.robot.y === this.level.goal.y;
-      const endReason = build ? "buildMissed" : bus ? "busMissed" : "missedGoal";
+      const endReason = build ? "buildMissed" : bus ? "busMissed" : ocean ? "oceanMissed" : "missedGoal";
 
       const step = () => {
         if (i >= cmds.length) {
@@ -299,6 +325,13 @@
             onDone({ win: false, reason: "wrongPart" });
             return;
           }
+        }
+
+        // ocean: swimming over a fish eats it
+        if (ocean && moved) {
+          const fish = this.level.fish.find(
+            (f) => f.x === this.robot.x && f.y === this.robot.y && !this.served.has(this._stopKey(f)));
+          if (fish) { this.served.add(this._stopKey(fish)); this.draw(); }
         }
 
         // bus: arriving at a stop requires the matching LED colour

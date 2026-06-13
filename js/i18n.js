@@ -123,6 +123,14 @@
       partWing: "Wing", partNose: "Nose", partBooster: "Booster",
       wrongPart: "That part doesn't fit here! Check the order 💪",
       buildMissed: "Not finished — match the target! 💪",
+      // Ocean pack
+      oceanPack: "Ocean",
+      o1: "First Fish", o1goal: "Swim to the fish 🐟",
+      o2: "Two Fish", o2goal: "Eat both fish",
+      o3: "Around the Coral", o3goal: "Turn around the coral",
+      o4: "Fish Trail", o4goal: "Use Repeat to eat them all",
+      o5: "Ocean Feast", o5goal: "Eat every fish in the sea",
+      oceanMissed: "Still hungry! Some fish got away 💪",
     },
     "zh-tw": {
       appTitle: "程式冒險小高手",
@@ -243,6 +251,14 @@
       partWing: "機翼", partNose: "機鼻", partBooster: "推進器",
       wrongPart: "這個零件放錯了！檢查順序 💪",
       buildMissed: "還沒組好 — 照著目標做！💪",
+      // Ocean pack
+      oceanPack: "海洋世界",
+      o1: "第一條魚", o1goal: "游去吃魚 🐟",
+      o2: "兩條魚", o2goal: "把兩條魚都吃掉",
+      o3: "繞過珊瑚", o3goal: "轉彎繞過珊瑚",
+      o4: "魚群", o4goal: "用重複把魚都吃光",
+      o5: "海洋大餐", o5goal: "吃掉海裡每一條魚",
+      oceanMissed: "還沒吃飽！有魚游走了 💪",
     },
   };
 

@@ -44,6 +44,7 @@
     renderLevelGrid();
     renderBusGrid();
     renderBuildGrid();
+    renderOceanGrid();
     renderCustomGrid();
     renderLeaderboard();
   }
@@ -70,6 +71,9 @@
   }
   function renderBuildGrid() {
     if (typeof BUILD_LEVELS !== "undefined") renderPackGrid(BUILD_LEVELS, "buildGrid", "🛠️");
+  }
+  function renderOceanGrid() {
+    if (typeof OCEAN_LEVELS !== "undefined") renderPackGrid(OCEAN_LEVELS, "oceanGrid", "🐋");
   }
 
   function renderLevelGrid() {
