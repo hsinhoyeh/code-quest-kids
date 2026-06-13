@@ -6,6 +6,9 @@
     left: { icon: "↩️", labelKey: "blockLeft", cls: "blk-turn" },
     right: { icon: "↪️", labelKey: "blockRight", cls: "blk-turn" },
     repeat: { icon: "🔁", labelKey: "blockRepeat", cls: "blk-repeat" },
+    red: { icon: "🔴", labelKey: "lightRed", cls: "blk-light light-red" },
+    green: { icon: "🟢", labelKey: "lightGreen", cls: "blk-light light-green" },
+    yellow: { icon: "🟡", labelKey: "lightYellow", cls: "blk-light light-yellow" },
   };
 
   const Blocks = {

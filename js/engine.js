@@ -7,6 +7,8 @@
     [-1, 0], // left
   ];
 
+  const COLORS = { red: "#e53935", green: "#43c463", yellow: "#fdd835" };
+
   const Engine = {
     canvas: null,
     ctx: null,
@@ -24,7 +26,10 @@
 
     load(level) {
       this.level = level;
+      this.mode = level.kind || "maze";
       this.robot = { x: level.start.x, y: level.start.y, dir: level.start.dir };
+      this.led = null;
+      this.served = new Set();
       this._computeLayout();
       this.draw();
     },
@@ -33,8 +38,12 @@
       if (!this.level) return;
       const s = this.level.start;
       this.robot = { x: s.x, y: s.y, dir: s.dir };
+      this.led = null;
+      this.served = new Set();
       this.draw();
     },
+
+    _stopKey(s) { return `${s.x},${s.y}`; },
 
     _computeLayout() {
       const L = this.level;
@@ -51,10 +60,12 @@
       const ctx = this.ctx, L = this.level, c = this.cell;
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+      const bus = this.mode === "bus";
       // cells
       for (let y = 0; y < L.rows; y++) {
         for (let x = 0; x < L.cols; x++) {
-          ctx.fillStyle = (x + y) % 2 === 0 ? "#eaf6ff" : "#d8eefc";
+          if (bus) ctx.fillStyle = (x + y) % 2 === 0 ? "#d7d7d7" : "#cccccc";
+          else ctx.fillStyle = (x + y) % 2 === 0 ? "#eaf6ff" : "#d8eefc";
           ctx.fillRect(this._cx(x), this._cy(y), c, c);
         }
       }
@@ -74,25 +85,59 @@
         ctx.stroke();
       }
 
-      // walls
+      // walls (buildings in bus mode)
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
       L.walls.forEach((w) => {
-        ctx.fillStyle = "#8d6e63";
+        ctx.fillStyle = bus ? "#90a4ae" : "#8d6e63";
         roundRect(ctx, this._cx(w.x) + 4, this._cy(w.y) + 4, c - 8, c - 8, 8);
         ctx.fill();
         ctx.font = `${Math.floor(c * 0.5)}px serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("🧱", this._cx(w.x) + c / 2, this._cy(w.y) + c / 2 + 2);
+        ctx.fillText(bus ? "🏢" : "🧱", this._cx(w.x) + c / 2, this._cy(w.y) + c / 2 + 2);
       });
 
-      // goal
-      ctx.font = `${Math.floor(c * 0.6)}px serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("🚩", this._cx(L.goal.x) + c / 2, this._cy(L.goal.y) + c / 2 + 2);
+      if (bus) {
+        // bus stops with required colour
+        (L.stops || []).forEach((s) => {
+          const served = this.served.has(this._stopKey(s));
+          ctx.fillStyle = served ? COLORS[s.color] : "#ffffff";
+          ctx.strokeStyle = COLORS[s.color];
+          ctx.lineWidth = 5;
+          roundRect(ctx, this._cx(s.x) + 6, this._cy(s.y) + 6, c - 12, c - 12, 10);
+          ctx.fill(); ctx.stroke();
+          ctx.font = `${Math.floor(c * 0.45)}px serif`;
+          ctx.fillText(served ? "✅" : "🚏", this._cx(s.x) + c / 2, this._cy(s.y) + c / 2 + 2);
+        });
+        this._drawBus();
+      } else {
+        // goal flag
+        ctx.font = `${Math.floor(c * 0.6)}px serif`;
+        ctx.fillText("🚩", this._cx(L.goal.x) + c / 2, this._cy(L.goal.y) + c / 2 + 2);
+        this._drawRobot();
+      }
+    },
 
-      // robot
-      this._drawRobot();
+    _drawBus() {
+      const ctx = this.ctx, c = this.cell, r = this.robot;
+      const px = this._cx(r.x) + c / 2, py = this._cy(r.y) + c / 2;
+      // LED sign on top: filled with current colour (grey if off)
+      const led = this.led ? COLORS[this.led] : "#9e9e9e";
+      ctx.fillStyle = led;
+      ctx.beginPath();
+      ctx.arc(px, py - c * 0.3, c * 0.12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#333"; ctx.lineWidth = 2; ctx.stroke();
+      // bus + direction
+      const [dx, dy] = DIRS[r.dir];
+      ctx.fillStyle = "#ff7043"; ctx.beginPath();
+      const a = c * 0.34, ang = Math.atan2(dy, dx), bw = c * 0.14;
+      ctx.moveTo(px + dx * a, py + dy * a);
+      ctx.lineTo(px + Math.cos(ang + Math.PI / 2) * bw - dx * a * 0.4, py + Math.sin(ang + Math.PI / 2) * bw - dy * a * 0.4);
+      ctx.lineTo(px + Math.cos(ang - Math.PI / 2) * bw - dx * a * 0.4, py + Math.sin(ang - Math.PI / 2) * bw - dy * a * 0.4);
+      ctx.closePath(); ctx.fill();
+      ctx.font = `${Math.floor(c * 0.55)}px serif`;
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("🚌", px, py + 2);
     },
 
     _drawRobot() {
@@ -149,41 +194,59 @@
       this.running = true;
       let i = 0;
 
+      const bus = this.mode === "bus";
+      const won = () =>
+        bus ? this.served.size === this.level.stops.length
+            : this.robot.x === this.level.goal.x && this.robot.y === this.level.goal.y;
+
       const step = () => {
         if (i >= cmds.length) {
           this.running = false;
-          const atGoal = this.robot.x === this.level.goal.x && this.robot.y === this.level.goal.y;
-          onDone(atGoal ? { win: true } : { win: false, reason: "missedGoal" });
+          onDone(won() ? { win: true } : { win: false, reason: bus ? "busMissed" : "missedGoal" });
           return;
         }
         const cmd = cmds[i++];
-        let bumped = false;
+        let moved = false;
 
         if (cmd === "left") {
           this.robot.dir = (this.robot.dir + 3) % 4;
         } else if (cmd === "right") {
           this.robot.dir = (this.robot.dir + 1) % 4;
+        } else if (cmd === "red" || cmd === "green" || cmd === "yellow") {
+          this.led = cmd;
         } else if (cmd === "forward") {
           const [dx, dy] = DIRS[this.robot.dir];
           const nx = this.robot.x + dx, ny = this.robot.y + dy;
           if (this._blocked(nx, ny)) {
-            bumped = true;
-          } else {
-            this.robot.x = nx;
-            this.robot.y = ny;
+            this.draw();
+            this.running = false;
+            this._flash("#ff5252");
+            onDone({ win: false, reason: "bumped" });
+            return;
           }
+          this.robot.x = nx; this.robot.y = ny;
+          moved = true;
         }
         this.draw();
 
-        if (bumped) {
-          this.running = false;
-          this._flash("#ff5252");
-          onDone({ win: false, reason: "bumped" });
-          return;
+        // bus: arriving at a stop requires the matching LED colour
+        if (bus && moved) {
+          const stop = this.level.stops.find(
+            (s) => s.x === this.robot.x && s.y === this.robot.y && !this.served.has(this._stopKey(s)));
+          if (stop) {
+            if (this.led === stop.color) {
+              this.served.add(this._stopKey(stop));
+              this.draw();
+            } else {
+              this.running = false;
+              this._flash("#ff5252");
+              onDone({ win: false, reason: "wrongColor" });
+              return;
+            }
+          }
         }
 
-        // early win even if extra commands remain
-        if (this.robot.x === this.level.goal.x && this.robot.y === this.level.goal.y) {
+        if (won()) {
           this.running = false;
           onDone({ win: true });
           return;

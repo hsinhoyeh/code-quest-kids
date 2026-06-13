@@ -144,6 +144,10 @@ body {
 .blk-move { background: var(--accent); }
 .blk-turn { background: var(--purple); }
 .blk-repeat { background: #ff8f00; }
+.blk-light { color: #2b2d42; }
+.light-red { background: #ef9a9a; }
+.light-green { background: #a5d6a7; }
+.light-yellow { background: #fff59d; }
 
 .program { min-height: 160px; display: flex; flex-direction: column; gap: 8px; }
 .chip { position: relative; cursor: default; padding-right: 36px; }

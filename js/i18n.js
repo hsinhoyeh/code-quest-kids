@@ -97,6 +97,16 @@
       backToEditor: "Back to editor",
       importPrompt: "Paste quest JSON:",
       importBad: "That doesn't look like a valid quest.",
+      // Bus & Lights pack
+      busPack: "Bus & Lights",
+      b1: "First Bus", b1goal: "Drive to the bus stop",
+      b2: "Two Stops", b2goal: "Serve both stops",
+      b3: "Drive & Turn", b3goal: "Turn to reach the stops",
+      b4: "Loop Route", b4goal: "Use Repeat to serve every stop",
+      b5: "Rainbow Route", b5goal: "Switch colours along the way",
+      lightRed: "Light: Red", lightGreen: "Light: Green", lightYellow: "Light: Yellow",
+      wrongColor: "Wrong light! Set the right colour before the stop 💪",
+      busMissed: "Some stops still need the bus! Try again 💪",
     },
     "zh-tw": {
       appTitle: "程式冒險小高手",
@@ -191,6 +201,16 @@
       backToEditor: "回到編輯器",
       importPrompt: "貼上任務 JSON：",
       importBad: "這看起來不是有效的任務。",
+      // Bus & Lights pack
+      busPack: "公車與燈光",
+      b1: "第一班公車", b1goal: "開到公車站",
+      b2: "兩個站牌", b2goal: "載客到兩個站",
+      b3: "開車轉彎", b3goal: "轉彎開到站牌",
+      b4: "迴圈路線", b4goal: "用重複開過每一站",
+      b5: "彩虹路線", b5goal: "一路上換顏色",
+      lightRed: "紅燈", lightGreen: "綠燈", lightYellow: "黃燈",
+      wrongColor: "燈號不對！到站前先換對顏色 💪",
+      busMissed: "還有站沒載到客人！再試一次 💪",
     },
   };
 

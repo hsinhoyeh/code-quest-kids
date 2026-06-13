@@ -1,7 +1,16 @@
 /* app.js — wires screens, levels, scoring, modals & leaderboard together. */
 (function () {
   let currentLevel = null;
+  let currentPack = null;  // the array the current level belongs to (for "next")
+  let nextLevelRef = null; // resolved on win
   let playOrigin = "menu"; // "menu" | "editor" — where Back returns to
+
+  // A level is unlocked if it's first in its pack or the previous one was cleared.
+  function unlockedIn(pack, lvl) {
+    const i = pack.indexOf(lvl);
+    if (i <= 0) return true;
+    return !!Store.levelResult(pack[i - 1].id);
+  }
 
   const $ = (id) => document.getElementById(id);
 
@@ -33,6 +42,7 @@
   function renderMenu() {
     $("playerNameDisplay").textContent = Store.getPlayer() || "—";
     renderLevelGrid();
+    renderBusGrid();
     renderCustomGrid();
     renderLeaderboard();
   }
@@ -41,7 +51,7 @@
     const grid = $("levelGrid");
     grid.innerHTML = "";
     LEVELS.forEach((lvl) => {
-      const unlocked = Store.isUnlocked(lvl.id);
+      const unlocked = unlockedIn(LEVELS, lvl);
       const res = Store.levelResult(lvl.id);
       const card = document.createElement("button");
       card.className = "level-card" + (unlocked ? "" : " locked");
@@ -51,10 +61,30 @@
         <div class="level-name">${I18N.markup(levelName(lvl))}</div>
         <div class="level-stars">${unlocked ? stars : "🔒"}</div>`;
       if (unlocked) {
-        card.addEventListener("click", () => startLevel(lvl));
+        card.addEventListener("click", () => startLevel(lvl, "menu", LEVELS));
       } else {
         card.title = I18N.t("locked");
       }
+      grid.appendChild(card);
+    });
+  }
+
+  function renderBusGrid() {
+    const grid = $("busGrid");
+    if (!grid || typeof BUS_LEVELS === "undefined") return;
+    grid.innerHTML = "";
+    BUS_LEVELS.forEach((lvl, idx) => {
+      const unlocked = unlockedIn(BUS_LEVELS, lvl);
+      const res = Store.levelResult(lvl.id);
+      const card = document.createElement("button");
+      card.className = "level-card" + (unlocked ? "" : " locked");
+      const stars = res ? "⭐".repeat(res.stars) + "☆".repeat(3 - res.stars) : "☆☆☆";
+      card.innerHTML = `
+        <div class="level-num">🚌${idx + 1}</div>
+        <div class="level-name">${I18N.markup(levelName(lvl))}</div>
+        <div class="level-stars">${unlocked ? stars : "🔒"}</div>`;
+      if (unlocked) card.addEventListener("click", () => startLevel(lvl, "menu", BUS_LEVELS));
+      else card.title = I18N.t("locked");
       grid.appendChild(card);
     });
   }
@@ -118,8 +148,9 @@
   }
 
   /* ---------- play ---------- */
-  function startLevel(lvl, origin) {
+  function startLevel(lvl, origin, pack) {
     currentLevel = lvl;
+    currentPack = pack || null;
     playOrigin = origin || "menu";
     const num = lvl.isCustom ? "🎓" : lvl.id + ".";
     I18N.setText($("levelTitle"), `${num} ${levelName(lvl)}`);
@@ -159,8 +190,12 @@
 
     $("winStars").textContent = "⭐".repeat(stars) + "☆".repeat(3 - stars);
     $("winScore").textContent = score;
-    const next = currentLevel.isCustom ? null : LEVELS.find((l) => l.id === currentLevel.id + 1);
-    $("nextLevelBtn").style.display = next ? "inline-block" : "none";
+    nextLevelRef = null;
+    if (currentPack) {
+      const i = currentPack.indexOf(currentLevel);
+      if (i > -1 && i + 1 < currentPack.length) nextLevelRef = currentPack[i + 1];
+    }
+    $("nextLevelBtn").style.display = nextLevelRef ? "inline-block" : "none";
     openModal("winModal");
     setRunEnabled(true);
   }
@@ -218,8 +253,7 @@
     $("toMenuBtn").addEventListener("click", () => { closeModal("winModal"); show("screen-menu"); renderMenu(); });
     $("nextLevelBtn").addEventListener("click", () => {
       closeModal("winModal");
-      const next = LEVELS.find((l) => l.id === currentLevel.id + 1);
-      if (next) startLevel(next);
+      if (nextLevelRef) startLevel(nextLevelRef, "menu", currentPack);
     });
 
     // close modals by clicking backdrop
