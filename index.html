@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code Quest Kids</title>
+  <meta name="description" content="A Scratch-style visual programming game for kids. Guide your robot, learn to code, climb the leaderboard!" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-logo">🤖</span>
+      <h1 data-i18n="appTitle">Code Quest Kids</h1>
+    </div>
+    <div class="topbar-controls">
+      <button id="howToBtn" class="pill" data-i18n="howTo">How to play</button>
+      <button id="teacherBtn" class="pill">🎓 <span data-i18n="teacher">Teacher</span></button>
+      <div class="lang-switch" role="group" aria-label="Language">
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="zh-tw">中文</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="screen-menu" class="screen active">
+    <section class="hero">
+      <h2 data-i18n="pickLevel">Pick a Quest!</h2>
+      <p class="player-line">
+        <span data-i18n="playerLabel">Player:</span>
+        <strong id="playerNameDisplay">—</strong>
+        <button id="changeNameBtn" class="link-btn" data-i18n="changeName">change</button>
+      </p>
+    </section>
+    <div id="levelGrid" class="level-grid"></div>
+
+    <section id="customSection" class="custom-section">
+      <h3>🎓 <span data-i18n="teacherQuests">Teacher's Quests</span></h3>
+      <div id="customGrid" class="level-grid"></div>
+      <p id="customEmpty" class="muted" data-i18n="noCustom">No teacher quests yet.</p>
+    </section>
+
+    <section class="leaderboard-card">
+      <h3>🏆 <span data-i18n="leaderboard">Leaderboard</span></h3>
+      <ol id="leaderboardList" class="leaderboard-list"></ol>
+      <p id="leaderboardEmpty" class="muted" data-i18n="noScores">No scores yet — be the first hero!</p>
+    </section>
+  </main>
+
+  <main id="screen-play" class="screen">
+    <div class="play-topline">
+      <button id="backBtn" class="pill">⬅ <span data-i18n="back">Back</span></button>
+      <h2 id="levelTitle">Level</h2>
+      <div class="goal-hint">🎯 <span id="levelGoal"></span></div>
+    </div>
+
+    <div class="play-area">
+      <!-- Stage -->
+      <div class="stage-wrap">
+        <canvas id="stage" width="520" height="520" aria-label="game board"></canvas>
+        <div class="run-controls">
+          <button id="runBtn" class="btn-run">▶ <span data-i18n="run">Run</span></button>
+          <button id="resetBtn" class="btn-secondary">↺ <span data-i18n="reset">Reset</span></button>
+          <span id="blockCounter" class="block-counter"></span>
+        </div>
+      </div>
+
+      <!-- Block palette -->
+      <div class="palette-wrap">
+        <h3 data-i18n="blocks">Blocks</h3>
+        <div id="palette" class="palette"></div>
+        <p class="hint" data-i18n="paletteHint">Tap a block to add it to your program ↓</p>
+      </div>
+
+      <!-- Program -->
+      <div class="program-wrap">
+        <h3 data-i18n="myProgram">My Program</h3>
+        <div id="program" class="program"></div>
+        <button id="clearBtn" class="link-btn" data-i18n="clearAll">clear all</button>
+      </div>
+    </div>
+  </main>
+
+  <main id="screen-editor" class="screen">
+    <div class="play-topline">
+      <button id="editorBackBtn" class="pill">⬅ <span data-i18n="back">Back</span></button>
+      <h2 data-i18n="editorTitle">Level Editor</h2>
+    </div>
+    <p class="hint" data-i18n="editorHint">Pick a tool, then tap the grid to build your maze.</p>
+
+    <div class="editor-area">
+      <div class="stage-wrap">
+        <canvas id="editorStage" width="520" height="520" aria-label="editor board"></canvas>
+        <div class="run-controls">
+          <button id="testQuestBtn" class="btn-run" data-i18n="testQuest">▶ Test</button>
+          <button id="saveQuestBtn" class="btn-secondary" data-i18n="saveQuest">💾 Save</button>
+          <button id="exportQuestBtn" class="btn-secondary" data-i18n="exportQuest">⬇ Export</button>
+          <button id="importQuestBtn" class="btn-secondary" data-i18n="importQuest">⬆ Import</button>
+        </div>
+      </div>
+
+      <div class="editor-panel">
+        <div class="tool-row" id="toolRow">
+          <button class="tool-btn" data-tool="start" data-i18n="toolStart">Start 🤖</button>
+          <button class="tool-btn" data-tool="goal" data-i18n="toolGoal">Goal 🚩</button>
+          <button class="tool-btn" data-tool="wall" data-i18n="toolWall">Wall 🧱</button>
+          <button class="tool-btn" data-tool="erase" data-i18n="toolErase">Erase 🧽</button>
+        </div>
+
+        <label class="field">
+          <span data-i18n="facing">Robot faces</span>
+          <select id="facingSelect">
+            <option value="0" data-i18n="dirUp">Up</option>
+            <option value="1" data-i18n="dirRight">Right</option>
+            <option value="2" data-i18n="dirDown">Down</option>
+            <option value="3" data-i18n="dirLeft">Left</option>
+          </select>
+        </label>
+
+        <div class="field-row">
+          <label class="field">
+            <span data-i18n="colsLabel">Columns</span>
+            <input id="colsInput" type="number" min="3" max="8" value="5" />
+          </label>
+          <label class="field">
+            <span data-i18n="rowsLabel">Rows</span>
+            <input id="rowsInput" type="number" min="3" max="8" value="5" />
+          </label>
+        </div>
+
+        <fieldset class="field blocks-field">
+          <legend data-i18n="allowedBlocks">Blocks kids can use</legend>
+          <label><input type="checkbox" id="allowForward" checked disabled /> ⬆️</label>
+          <label><input type="checkbox" id="allowLeft" checked /> ↩️</label>
+          <label><input type="checkbox" id="allowRight" checked /> ↪️</label>
+          <label><input type="checkbox" id="allowRepeat" /> 🔁</label>
+        </fieldset>
+
+        <label class="field">
+          <span data-i18n="optimalBlocks">Target blocks (for ⭐⭐⭐)</span>
+          <span class="inline-row">
+            <input id="optimalInput" type="number" min="1" max="50" value="3" />
+            <button id="autoSolveBtn" class="btn-secondary small" data-i18n="autoSolve">Auto</button>
+          </span>
+        </label>
+
+        <label class="field"><span data-i18n="nameEn">Quest name (English)</span>
+          <input id="nameEnInput" type="text" maxlength="24" placeholder="My Maze" /></label>
+        <label class="field"><span data-i18n="nameZh">Quest name (中文)</span>
+          <input id="nameZhInput" type="text" maxlength="24" placeholder="我的迷宮" /></label>
+        <label class="field"><span data-i18n="goalEnLabel">Hint (English)</span>
+          <input id="goalEnInput" type="text" maxlength="40" placeholder="Reach the flag" /></label>
+        <label class="field"><span data-i18n="goalZhLabel">Hint (中文)</span>
+          <input id="goalZhInput" type="text" maxlength="40" placeholder="走到旗子" /></label>
+      </div>
+    </div>
+  </main>
+
+  <!-- Name modal -->
+  <div id="nameModal" class="modal-backdrop">
+    <div class="modal">
+      <h3 data-i18n="whatsYourName">What's your hero name?</h3>
+      <input id="nameInput" type="text" maxlength="14" autocomplete="off" placeholder="Robo-Sam" />
+      <button id="saveNameBtn" class="btn-run" data-i18n="letsGo">Let's go!</button>
+    </div>
+  </div>
+
+  <!-- Win modal -->
+  <div id="winModal" class="modal-backdrop">
+    <div class="modal win-modal">
+      <div class="stars" id="winStars">⭐⭐⭐</div>
+      <h3 data-i18n="youDidIt">You did it! 🎉</h3>
+      <p><span data-i18n="scoreEarned">Score earned:</span> <strong id="winScore">0</strong></p>
+      <div class="modal-actions">
+        <button id="nextLevelBtn" class="btn-run" data-i18n="nextQuest">Next Quest ➡</button>
+        <button id="replayBtn" class="btn-secondary" data-i18n="playAgain">Play again</button>
+        <button id="toMenuBtn" class="link-btn" data-i18n="backToMenu">Back to menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- How-to modal -->
+  <div id="howToModal" class="modal-backdrop">
+    <div class="modal">
+      <h3 data-i18n="howTo">How to play</h3>
+      <ul class="howto-list">
+        <li data-i18n="howto1">1. Tap blocks to build a program.</li>
+        <li data-i18n="howto2">2. Press ▶ Run to move your robot.</li>
+        <li data-i18n="howto3">3. Reach the 🎯 goal to win!</li>
+        <li data-i18n="howto4">4. Use fewer blocks to earn more ⭐.</li>
+      </ul>
+      <button id="closeHowToBtn" class="btn-run" data-i18n="gotIt">Got it!</button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <span data-i18n="madeWith">Made with</span> ❤️ <span data-i18n="forYoungCoders">for young coders</span>
+  </footer>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/leaderboard.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/blocks.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
