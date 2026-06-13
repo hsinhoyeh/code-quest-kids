@@ -1,109 +1,139 @@
 # 🤖 Code Quest Kids
 
-A Scratch-style **visual programming game** for young coders (~age 8). Kids tap
-colourful blocks to build a program, run their robot through maze quests, earn
-⭐ for clever solutions, and climb the 🏆 leaderboard.
+A Scratch-style **visual programming game** for young coders (age 6–10). Tap
+colourful blocks to build a program, guide your robot, earn ⭐ for clever
+solutions, and climb the 🏆 leaderboard.
 
-Bilingual out of the box: **English** + **繁體中文 (zh-TW)**. 100% static — no
-build step, no backend — so it deploys straight to **GitHub Pages**.
+Bilingual out of the box: **English** + **繁體中文 (zh-TW)** with 注音 (zhuyin /
+bopomofo) annotations on every Chinese character. 100% static — no build step,
+no backend — deploys straight to **GitHub Pages**.
 
-> 程式冒險小高手 — 一款給 8 歲小朋友的視覺化程式遊戲。點積木、組程式、帶機器人
-> 闖關，拿星星、上排行榜！支援中英文，純靜態網頁，可直接放到 GitHub Pages。
+> 程式冒險小高手 — 給 6–10 歲小朋友的視覺化程式遊戲。點積木、組程式、帶機器人
+> 闖五大主題關卡，拿星星、上排行榜！支援中英雙語加注音，純靜態網頁。
+
+**Live site:** https://hsinhoyeh.github.io/code-quest-kids/
 
 ---
 
-## 🎮 How it plays
+## 🎮 Game packs
 
-1. **Tap blocks** (`Move forward`, `Turn left`, `Turn right`, `Repeat`) to build a program.
-2. Press **▶ Run** to send the robot through the maze.
-3. Reach the **🚩 goal** to win the quest.
-4. Solve it with **fewer blocks** to earn more ⭐ (this rewards *loops* and efficient thinking).
+### 🤖 Maze Quest (10 levels · age 6–10)
+Tap `Move forward`, `Turn left`, `Turn right`, and `Repeat` blocks to guide the
+robot to the 🚩 flag. Fewer blocks = more ⭐. Levels 1–6 (~age 6–8) introduce
+sequencing, turning, and loops. Levels 7–10 (~age 8–10) add longer paths and
+multi-step planning.
 
-### Learning progression (designed as a teacher, not just a game)
+| Level | Concept |
+|-------|---------|
+| 1 First Steps | Sequencing |
+| 2 Turn Around | Directions & turning |
+| 3 The Corner | Combining moves + turns |
+| 4 Zig Zag | Longer sequences |
+| 5 Loop Power | **Repeat** block |
+| 6 The Spiral | Loops + turns (decomposition) |
+| 7 Crossroads | 6×6 grid, multi-turn planning |
+| 8 The Wall | Navigating around barriers |
+| 9 Staircase | Diagonal path with loops |
+| 10 Big U-Turn | 7×7 grid, full-path planning |
 
-| Quest | Concept introduced |
-|------|--------------------|
-| 1 First Steps | Sequencing — one command after another |
-| 2 Turn Around | Direction & turning |
-| 3 The Corner | Combining moves + turns into a plan |
-| 4 Zig Zag | Longer sequences, reading a path |
-| 5 Loop Power | **Repeat** — doing the same thing many times |
-| 6 The Spiral | Loops **+** turns together (decomposition) |
+### 🚌 Bus & Lights (5 levels)
+Drive the bus to pick up passengers and match the LED light color at each stop.
+Introduces **conditional-style** thinking: red / green / yellow commands
+alongside movement.
 
-Stars: `3⭐` if you match the optimal block count, `2⭐` within +2, otherwise `1⭐`.
+### 🛠️ Build It! (5 levels)
+Assemble a **car → airplane → rocket** by placing parts in the correct order.
+Teaches sequencing in a construction context: body before windows, wings before
+nose, etc.
+
+### 🐋 Ocean (5 levels)
+Guide a whale shark through the ocean, collecting fish. Combines movement with
+resource-gathering — eat all the fish to win.
+
+### 🚚 Cargo Run (5 levels)
+Visit sites to pick up goods, each with a **weight** and a **value**. Deliver to
+the destination without exceeding the weight limit while maximising total value —
+an age-appropriate introduction to the **knapsack problem**.
+
+---
+
+## ⭐ Scoring
+
+Stars are awarded per level based on how efficiently you solved it:
+
+- **⭐⭐⭐** — matched (or beat) the optimal block count
+- **⭐⭐** — within +2 blocks of optimal
+- **⭐** — solved it! (any number of blocks)
+
+Every level shows an **objective banner** before you start so the goal and
+constraints are crystal clear.
+
+---
+
+## 🎓 Teacher features
+
+- **Level editor** — draw a custom maze, set allowed blocks, name it in both
+  languages, test it, save it, and export/import as JSON.
+- **Players panel** — switch between multiple players (each with their own scores),
+  or add a new player to start fresh.
+- Levels are localStorage-persisted per device; no accounts, no data collection —
+  kid-safe by design.
 
 ---
 
 ## 🚀 Run locally
 
-It's just static files — any web server works:
-
 ```bash
-# from this folder
 python3 -m http.server 8000
-# then open http://localhost:8000
+# open http://localhost:8000
 ```
 
-(Opening `index.html` directly also works, but a server avoids browser quirks.)
+Any static web server works. Opening `index.html` directly also works in most
+browsers.
 
 ---
 
 ## 🌐 Deploy to GitHub Pages
 
-**Option A — GitHub Actions (included).** Push to `main`; the workflow in
-`.github/workflows/deploy.yml` publishes the site. In your repo: **Settings →
-Pages → Build and deployment → Source: GitHub Actions**.
+**Included GitHub Actions workflow** pushes the site on every commit to `master`:
 
-**Option B — Branch deploy.** **Settings → Pages → Source: Deploy from a branch
-→ `main` / root**. Done.
+```
+.github/workflows/deploy.yml
+```
 
-Your game will be live at `https://<username>.github.io/<repo>/`.
+In your repo: **Settings → Pages → Build and deployment → Source: GitHub
+Actions**. The site goes live at `https://<username>.github.io/code-quest-kids/`.
 
 ---
 
 ## 🧩 Project structure
 
 ```
-index.html          # markup + screens + modals
-css/style.css       # playful, big-tap-target styling
-js/i18n.js          # EN / 繁中 strings + language switch
-js/levels.js        # quest definitions (grid, walls, goal, optimal blocks)
-js/engine.js        # canvas rendering + program execution
-js/blocks.js        # block palette + click-to-add program builder
-js/leaderboard.js   # localStorage scores & progress (per device)
-js/app.js           # glue: screens, scoring, modals, leaderboard
+index.html              # markup, screens, modals
+css/style.css           # playful, big-tap-target styling
+js/zhuyin.js            # bopomofo dictionary + annotation engine
+js/i18n.js              # EN / 繁中 strings + language switch
+js/sound.js             # Web Audio synth (win fanfare, error tone)
+js/levels.js            # Maze pack (10 levels)
+js/busLevels.js         # Bus & Lights pack (5 levels)
+js/buildLevels.js       # Build It! pack (5 levels)
+js/oceanLevels.js       # Ocean pack (5 levels)
+js/cargoLevels.js       # Cargo Run pack (5 levels)
+js/engine.js            # canvas rendering + program execution
+js/blocks.js            # block palette + click-to-add program builder
+js/leaderboard.js       # localStorage scores & progress
+js/app.js               # screens, scoring, modals, leaderboard glue
+js/editor.js            # teacher level editor
 ```
-
-### Add your own quest
-
-Append an entry to `js/levels.js` and a name/goal string to **both** languages in
-`js/i18n.js` (`lvlN` / `lvlNgoal`). Directions: `0=up, 1=right, 2=down, 3=left`.
-
-```js
-{ id: 7, nameKey: "lvl7", goalKey: "lvl7goal",
-  cols: 6, rows: 6,
-  start: { x: 0, y: 5, dir: 0 },
-  goal:  { x: 5, y: 0 },
-  walls: [{ x: 2, y: 3 }],
-  allowed: ["forward", "left", "right", "repeat"],
-  optimal: 8 }
-```
-
-### Add another language
-
-Add a key (e.g. `"ja"`) to the `STRINGS` object in `js/i18n.js` and a matching
-`<button class="lang-btn" data-lang="ja">…</button>` in `index.html`.
 
 ---
 
 ## 🌍 Going global (shared leaderboard)
 
-The leaderboard is **per-device** (`localStorage`) by design — no accounts, no
-data collection, kid-safe. To make it shared across players, replace the read/
-write functions in `js/leaderboard.js` with `fetch()` calls to a tiny free
-key-value backend (e.g. a Cloudflare Worker + KV, Supabase, or jsonbin). Keep
-the same `record()` / `leaderboard()` interface and the rest of the app is
-unchanged.
+The leaderboard is **per-device** by design. To share scores across players,
+replace the read/write functions in `js/leaderboard.js` with `fetch()` calls to
+a key-value backend (Cloudflare Workers + KV, Supabase, jsonbin, etc.). The
+`record()` / `leaderboard()` interface stays the same — nothing else changes.
 
 ---
 
