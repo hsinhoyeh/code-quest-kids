@@ -16,6 +16,7 @@
     wing: { icon: "🪽", labelKey: "partWing", cls: "blk-part" },
     nose: { icon: "🔺", labelKey: "partNose", cls: "blk-part" },
     booster: { icon: "🔥", labelKey: "partBooster", cls: "blk-part" },
+    load: { icon: "📥", labelKey: "blockLoad", cls: "blk-load" },
   };
 
   const Blocks = {

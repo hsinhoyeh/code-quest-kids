@@ -38,6 +38,8 @@
       this.led = null;
       this.served = new Set();
       this.built = [];
+      this.cargoW = 0;
+      this.cargoV = 0;
       if (this.mode !== "build") this._computeLayout();
       this.draw();
     },
@@ -49,6 +51,8 @@
       this.led = null;
       this.served = new Set();
       this.built = [];
+      this.cargoW = 0;
+      this.cargoV = 0;
       this.draw();
     },
 
@@ -73,11 +77,13 @@
 
       const bus = this.mode === "bus";
       const ocean = this.mode === "ocean";
+      const cargo = this.mode === "cargo";
       // cells
       for (let y = 0; y < L.rows; y++) {
         for (let x = 0; x < L.cols; x++) {
           if (bus) ctx.fillStyle = (x + y) % 2 === 0 ? "#d7d7d7" : "#cccccc";
           else if (ocean) ctx.fillStyle = (x + y) % 2 === 0 ? "#81d4fa" : "#4fc3f7";
+          else if (cargo) ctx.fillStyle = (x + y) % 2 === 0 ? "#e0d3c4" : "#d2c2ae";
           else ctx.fillStyle = (x + y) % 2 === 0 ? "#eaf6ff" : "#d8eefc";
           ctx.fillRect(this._cx(x), this._cy(y), c, c);
         }
@@ -102,14 +108,37 @@
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       L.walls.forEach((w) => {
-        ctx.fillStyle = ocean ? "#ef9a9a" : bus ? "#90a4ae" : "#8d6e63";
+        ctx.fillStyle = ocean ? "#ef9a9a" : bus || cargo ? "#90a4ae" : "#8d6e63";
         roundRect(ctx, this._cx(w.x) + 4, this._cy(w.y) + 4, c - 8, c - 8, 8);
         ctx.fill();
         ctx.font = `${Math.floor(c * 0.5)}px serif`;
-        ctx.fillText(ocean ? "🪸" : bus ? "🏢" : "🧱", this._cx(w.x) + c / 2, this._cy(w.y) + c / 2 + 2);
+        ctx.fillText(ocean ? "🪸" : cargo ? "🚧" : bus ? "🏢" : "🧱", this._cx(w.x) + c / 2, this._cy(w.y) + c / 2 + 2);
       });
 
-      if (ocean) {
+      if (cargo) {
+        // pickup sites with weight/value
+        (L.sites || []).forEach((s) => {
+          const loaded = this.served.has(this._stopKey(s));
+          ctx.fillStyle = loaded ? "#c8e6c9" : "#fff9c4";
+          ctx.strokeStyle = loaded ? "#43c463" : "#fbc02d";
+          ctx.lineWidth = 4;
+          roundRect(ctx, this._cx(s.x) + 5, this._cy(s.y) + 5, c - 10, c - 10, 10);
+          ctx.fill(); ctx.stroke();
+          const cx = this._cx(s.x) + c / 2;
+          ctx.fillStyle = "#000";
+          ctx.font = `${Math.floor(c * 0.3)}px serif`;
+          ctx.fillText(loaded ? "✅" : "📦", cx, this._cy(s.y) + c * 0.32);
+          ctx.font = `${Math.floor(c * 0.2)}px sans-serif`;
+          ctx.fillText(`💰${s.value}`, cx, this._cy(s.y) + c * 0.6);
+          ctx.fillText(`⚖${s.weight}`, cx, this._cy(s.y) + c * 0.82);
+        });
+        // destination
+        ctx.font = `${Math.floor(c * 0.55)}px serif`;
+        ctx.fillStyle = "#000";
+        ctx.fillText("🏁", this._cx(L.dest.x) + c / 2, this._cy(L.dest.y) + c / 2 + 2);
+        this._drawActor("🚚", "#5d4037");
+        this._drawCargoHud();
+      } else if (ocean) {
         (L.fish || []).forEach((f) => {
           if (this.served.has(this._stopKey(f))) return; // eaten
           ctx.font = `${Math.floor(c * 0.6)}px serif`;
@@ -135,6 +164,21 @@
         ctx.fillText("🚩", this._cx(L.goal.x) + c / 2, this._cy(L.goal.y) + c / 2 + 2);
         this._drawRobot();
       }
+    },
+
+    _drawCargoHud() {
+      const ctx = this.ctx, W = this.canvas.width, L = this.level;
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      roundRect(ctx, 8, 8, W - 16, 38, 10);
+      ctx.fill();
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 22px sans-serif";
+      ctx.textAlign = "left"; ctx.textBaseline = "middle";
+      ctx.fillText(`⚖ ${this.cargoW}/${L.capacity}`, 20, 28);
+      ctx.textAlign = "right";
+      const enough = this.cargoV >= L.target;
+      ctx.fillStyle = enough ? "#9cffb0" : "#fff";
+      ctx.fillText(`💰 ${this.cargoV}/${L.target}`, W - 20, 28);
     },
 
     _drawActor(emoji, color) {
@@ -277,12 +321,14 @@
       const bus = this.mode === "bus";
       const build = this.mode === "build";
       const ocean = this.mode === "ocean";
+      const cargo = this.mode === "cargo";
       const won = () =>
         build ? this.built.length === this.level.target.length
         : bus ? this.served.size === this.level.stops.length
         : ocean ? this.served.size === this.level.fish.length
+        : cargo ? this.robot.x === this.level.dest.x && this.robot.y === this.level.dest.y && this.cargoV >= this.level.target
         : this.robot.x === this.level.goal.x && this.robot.y === this.level.goal.y;
-      const endReason = build ? "buildMissed" : bus ? "busMissed" : ocean ? "oceanMissed" : "missedGoal";
+      const endReason = build ? "buildMissed" : bus ? "busMissed" : ocean ? "oceanMissed" : cargo ? "cargoMissed" : "missedGoal";
 
       const step = () => {
         if (i >= cmds.length) {
@@ -295,6 +341,21 @@
 
         if (build && PARTS.has(cmd)) {
           this.built.push(cmd);
+        } else if (cargo && cmd === "load") {
+          const site = this.level.sites.find(
+            (s) => s.x === this.robot.x && s.y === this.robot.y && !this.served.has(this._stopKey(s)));
+          if (site) {
+            if (this.cargoW + site.weight > this.level.capacity) {
+              this.draw();
+              this.running = false;
+              this._flash("#ff5252");
+              onDone({ win: false, reason: "tooHeavy" });
+              return;
+            }
+            this.served.add(this._stopKey(site));
+            this.cargoW += site.weight;
+            this.cargoV += site.value;
+          }
         } else if (cmd === "left") {
           this.robot.dir = (this.robot.dir + 3) % 4;
         } else if (cmd === "right") {

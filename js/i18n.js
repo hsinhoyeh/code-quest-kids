@@ -131,6 +131,16 @@
       o4: "Fish Trail", o4goal: "Use Repeat to eat them all",
       o5: "Ocean Feast", o5goal: "Eat every fish in the sea",
       oceanMissed: "Still hungry! Some fish got away 💪",
+      // Cargo Run pack
+      cargoPack: "Cargo Run",
+      blockLoad: "Load",
+      g1: "First Delivery", g1goal: "Load the box, deliver to 🏁",
+      g2: "Pick the Best", g2goal: "Only one fits — grab the richer box",
+      g3: "Two Boxes", g3goal: "Fill up with the best value",
+      g4: "Heavy Choice", g4goal: "Two light boxes can beat one heavy box!",
+      g5: "Big Haul", g5goal: "Skip the heavy junk, grab the treasure",
+      tooHeavy: "Too heavy! The truck can't carry that 💪",
+      cargoMissed: "Deliver more value to the 🏁! Try again 💪",
     },
     "zh-tw": {
       appTitle: "程式冒險小高手",
@@ -259,6 +269,16 @@
       o4: "魚群", o4goal: "用重複把魚都吃光",
       o5: "海洋大餐", o5goal: "吃掉海裡每一條魚",
       oceanMissed: "還沒吃飽！有魚游走了 💪",
+      // Cargo Run pack
+      cargoPack: "貨運挑戰",
+      blockLoad: "裝貨",
+      g1: "第一趟", g1goal: "載貨送到 🏁",
+      g2: "挑最好的", g2goal: "只裝得下一個，選價值高的",
+      g3: "兩箱貨", g3goal: "裝滿最高的價值",
+      g4: "重量的選擇", g4goal: "兩個輕的貨能贏過一個重的！",
+      g5: "大豐收", g5goal: "別載重貨，載走寶物",
+      tooHeavy: "太重了！貨車載不動 💪",
+      cargoMissed: "送到 🏁 的價值還不夠！再試一次 💪",
     },
   };
 
