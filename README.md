@@ -17,11 +17,13 @@ no backend — deploys straight to **GitHub Pages**.
 
 ## 🎮 Game packs
 
-### 🤖 Maze Quest (10 levels · age 6–10)
+### 🤖 Maze Quest (12 levels · age 6–10)
 Tap `Move forward`, `Turn left`, `Turn right`, and `Repeat` blocks to guide the
 robot to the 🚩 flag. Fewer blocks = more ⭐. Levels 1–6 (~age 6–8) introduce
 sequencing, turning, and loops. Levels 7–10 (~age 8–10) add longer paths and
-multi-step planning.
+multi-step planning. Levels 11–12 introduce **math expressions** inside the
+Repeat block (`2+3`, `2×3`) — tap the `fx` button to switch from a plain number
+to a mini expression pad.
 
 | Level | Concept |
 |-------|---------|
@@ -35,6 +37,8 @@ multi-step planning.
 | 8 The Wall | Navigating around barriers |
 | 9 Staircase | Diagonal path with loops |
 | 10 Big U-Turn | 7×7 grid, full-path planning |
+| 11 Math Gateway | Double barrier — use `1+2` and `3+3` in Repeat |
+| 12 Multiply Express | Long corridors — use `2×3` in Repeat |
 
 ### 🚌 Bus & Lights (5 levels)
 Drive the bus to pick up passengers and match the LED light color at each stop.
@@ -70,12 +74,27 @@ constraints are crystal clear.
 
 ---
 
+## 👥 Multi-player
+
+Multiple kids can play on the same device, each with their own progress and
+leaderboard entry.
+
+- **👤 Player pill in the top bar** — always visible. Tap it at any time (menu,
+  mid-level, editor) to see all players and switch instantly.
+- **"Pass to friend 👤" on the win screen** — appears after every win; one tap
+  closes the win modal and opens the player switcher for a smooth handoff.
+- **Add a player** — type a name and press "Add & start fresh"; each new player
+  starts from level 1 with zero scores.
+- **Delete a player** — tap × next to any name in the players panel.
+- All progress is stored in `localStorage` per device — no accounts, no network,
+  completely kid-safe.
+
+---
+
 ## 🎓 Teacher features
 
 - **Level editor** — draw a custom maze, set allowed blocks, name it in both
   languages, test it, save it, and export/import as JSON.
-- **Players panel** — switch between multiple players (each with their own scores),
-  or add a new player to start fresh.
 - Levels are localStorage-persisted per device; no accounts, no data collection —
   kid-safe by design.
 
@@ -114,7 +133,7 @@ css/style.css           # playful, big-tap-target styling
 js/zhuyin.js            # bopomofo dictionary + annotation engine
 js/i18n.js              # EN / 繁中 strings + language switch
 js/sound.js             # Web Audio synth (win fanfare, error tone)
-js/levels.js            # Maze pack (10 levels)
+js/levels.js            # Maze pack (12 levels, incl. math expression levels)
 js/busLevels.js         # Bus & Lights pack (5 levels)
 js/buildLevels.js       # Build It! pack (5 levels)
 js/oceanLevels.js       # Ocean pack (5 levels)
