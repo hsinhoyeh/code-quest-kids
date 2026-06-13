@@ -164,6 +164,25 @@
     });
   }
 
+  /* ---------- how to play (per topic) ---------- */
+  const GOAL_KEY = {
+    maze: "howtoGoalMaze", bus: "howtoGoalBus", build: "howtoGoalBuild",
+    ocean: "howtoGoalOcean", cargo: "howtoGoalCargo",
+  };
+  function renderHowTo() {
+    const ul = $("howToList");
+    ul.innerHTML = "";
+    let goalKey = "howtoGoalMenu";
+    if ($("screen-play").classList.contains("active") && currentLevel) {
+      goalKey = GOAL_KEY[currentLevel.kind || "maze"] || "howtoGoalMaze";
+    }
+    [I18N.t("howto1"), I18N.t("howto2"), I18N.t(goalKey), I18N.t("howto4")].forEach((s, i) => {
+      const li = document.createElement("li");
+      I18N.setText(li, `${i + 1}. ${s}`);
+      ul.appendChild(li);
+    });
+  }
+
   /* ---------- players ---------- */
   function openPlayersModal() {
     renderPlayers();
@@ -294,7 +313,7 @@
     document.querySelectorAll(".lang-btn").forEach((b) =>
       b.addEventListener("click", () => I18N.setLang(b.dataset.lang)));
 
-    $("howToBtn").addEventListener("click", () => openModal("howToModal"));
+    $("howToBtn").addEventListener("click", () => { renderHowTo(); openModal("howToModal"); });
     $("closeHowToBtn").addEventListener("click", () => closeModal("howToModal"));
 
     $("changeNameBtn").addEventListener("click", openPlayersModal);
