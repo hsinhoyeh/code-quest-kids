@@ -237,5 +237,18 @@ body {
 .editor-panel .run-controls { display: none; }
 .editor-area .stage-wrap .run-controls { display: flex; }
 
+/* ---------- zhuyin (注音) ruby ---------- */
+ruby { ruby-position: over; ruby-align: center; }
+rt {
+  font-size: 0.5em; color: #d84315; font-weight: 700;
+  line-height: 1; letter-spacing: 0; user-select: none;
+}
+/* give annotated text breathing room so zhuyin doesn't clip */
+body.zh { line-height: 1.7; }
+body.zh .block, body.zh .chip, body.zh .pill, body.zh .btn-run,
+body.zh .btn-secondary, body.zh .tool-btn, body.zh .level-name,
+body.zh .lb-name { line-height: 1.6; }
+body.zh .brand h1, body.zh .hero h2 { line-height: 1.7; }
+
 /* ---------- footer ---------- */
 .footer { text-align: center; padding: 20px; color: #999; }

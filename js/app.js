@@ -48,7 +48,7 @@
       const stars = res ? "⭐".repeat(res.stars) + "☆".repeat(3 - res.stars) : "☆☆☆";
       card.innerHTML = `
         <div class="level-num">${lvl.id}</div>
-        <div class="level-name">${escapeHtml(levelName(lvl))}</div>
+        <div class="level-name">${I18N.markup(levelName(lvl))}</div>
         <div class="level-stars">${unlocked ? stars : "🔒"}</div>`;
       if (unlocked) {
         card.addEventListener("click", () => startLevel(lvl));
@@ -72,11 +72,11 @@
       card.className = "level-card custom";
       card.innerHTML = `
         <div class="level-num">🎓</div>
-        <div class="level-name">${escapeHtml(levelName(lvl))}</div>
+        <div class="level-name">${I18N.markup(levelName(lvl))}</div>
         <div class="level-stars">${stars}</div>
         <div class="card-tools">
-          <button class="link-btn" data-act="edit">${I18N.t("edit")}</button>
-          <button class="link-btn danger" data-act="del">${I18N.t("deleteQuest")}</button>
+          <button class="link-btn" data-act="edit">${I18N.markup(I18N.t("edit"))}</button>
+          <button class="link-btn danger" data-act="del">${I18N.markup(I18N.t("deleteQuest"))}</button>
         </div>`;
       card.querySelector(".level-name").addEventListener("click", () => startLevel(lvl));
       card.querySelector(".level-stars").addEventListener("click", () => startLevel(lvl));
@@ -110,7 +110,7 @@
       li.className = "lb-row" + me;
       li.innerHTML = `
         <span class="lb-rank">${medals[i] || i + 1}</span>
-        <span class="lb-name">${escapeHtml(r.name)}</span>
+        <span class="lb-name">${I18N.markup(r.name)}</span>
         <span class="lb-stars">${r.stars}⭐</span>
         <span class="lb-score">${r.score}</span>`;
       list.appendChild(li);
@@ -122,8 +122,8 @@
     currentLevel = lvl;
     playOrigin = origin || "menu";
     const num = lvl.isCustom ? "🎓" : lvl.id + ".";
-    $("levelTitle").textContent = `${num} ${levelName(lvl)}`;
-    $("levelGoal").textContent = levelGoal(lvl);
+    I18N.setText($("levelTitle"), `${num} ${levelName(lvl)}`);
+    I18N.setText($("levelGoal"), levelGoal(lvl));
     Blocks.setAllowed(lvl.allowed);
     Engine.load(lvl);
     updateCounter(0);
@@ -131,7 +131,7 @@
   }
 
   function updateCounter(n) {
-    $("blockCounter").textContent = `${I18N.t("blocksUsed")}: ${n}`;
+    I18N.setText($("blockCounter"), `${I18N.t("blocksUsed")}: ${n}`);
   }
 
   function runProgram() {
@@ -179,7 +179,7 @@
       t.className = "toast";
       document.body.appendChild(t);
     }
-    t.textContent = msg;
+    I18N.setText(t, msg);
     t.classList.add("show");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
@@ -237,8 +237,8 @@
         renderMenu();
       } else if ($("screen-play").classList.contains("active")) {
         const num = currentLevel.isCustom ? "🎓" : currentLevel.id + ".";
-        $("levelTitle").textContent = `${num} ${levelName(currentLevel)}`;
-        $("levelGoal").textContent = levelGoal(currentLevel);
+        I18N.setText($("levelTitle"), `${num} ${levelName(currentLevel)}`);
+        I18N.setText($("levelGoal"), levelGoal(currentLevel));
         Blocks.relabel();
         updateCounter(Blocks.count());
       }

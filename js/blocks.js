@@ -29,7 +29,7 @@
         const btn = document.createElement("button");
         btn.className = `block ${m.cls}`;
         btn.dataset.type = type;
-        btn.innerHTML = `<span class="blk-icon">${m.icon}</span><span class="blk-label">${I18N.t(m.labelKey)}</span>`;
+        btn.innerHTML = `<span class="blk-icon">${m.icon}</span><span class="blk-label">${I18N.markup(I18N.t(m.labelKey))}</span>`;
         btn.addEventListener("click", () => this.add(type));
         this.paletteEl.appendChild(btn);
       });
@@ -39,7 +39,7 @@
     relabel() {
       this.paletteEl.querySelectorAll(".block").forEach((btn) => {
         const m = META[btn.dataset.type];
-        if (m) btn.querySelector(".blk-label").textContent = I18N.t(m.labelKey);
+        if (m) btn.querySelector(".blk-label").innerHTML = I18N.markup(I18N.t(m.labelKey));
       });
       this.render();
     },
@@ -81,7 +81,7 @@
       const m = META[node.type];
       const el = document.createElement("div");
       el.className = `chip ${m.cls}`;
-      el.innerHTML = `<span class="blk-icon">${m.icon}</span><span>${I18N.t(m.labelKey)}</span>`;
+      el.innerHTML = `<span class="blk-icon">${m.icon}</span><span>${I18N.markup(I18N.t(m.labelKey))}</span>`;
       const del = document.createElement("button");
       del.className = "chip-x";
       del.textContent = "×";
@@ -102,7 +102,7 @@
 
       const head = document.createElement("div");
       head.className = "repeat-head";
-      head.innerHTML = `<span class="blk-icon">🔁</span><span>${I18N.t("blockRepeat")}</span>`;
+      head.innerHTML = `<span class="blk-icon">🔁</span><span>${I18N.markup(I18N.t("blockRepeat"))}</span>`;
 
       const stepper = document.createElement("div");
       stepper.className = "stepper";
@@ -115,7 +115,7 @@
 
       const times = document.createElement("span");
       times.className = "times-label";
-      times.textContent = I18N.t("blockTimes");
+      I18N.setText(times, I18N.t("blockTimes"));
 
       const del = document.createElement("button");
       del.className = "chip-x";
@@ -139,7 +139,7 @@
       if (node.children.length === 0) {
         const ph = document.createElement("div");
         ph.className = "drop-ph";
-        ph.textContent = I18N.t("dropHere");
+        I18N.setText(ph, I18N.t("dropHere"));
         body.appendChild(ph);
       } else {
         node.children.forEach((c) => body.appendChild(this._chip(c, node.children)));
@@ -155,7 +155,7 @@
       if (this.program.length === 0) {
         const ph = document.createElement("div");
         ph.className = "drop-ph big";
-        ph.textContent = I18N.t("dropHere");
+        I18N.setText(ph, I18N.t("dropHere"));
         el.appendChild(ph);
       } else {
         this.program.forEach((node) => {

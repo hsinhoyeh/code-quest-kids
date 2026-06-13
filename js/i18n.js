@@ -221,10 +221,25 @@
       return (STRINGS[this.lang] && STRINGS[this.lang][key]) || STRINGS.en[key] || key;
     },
 
+    // Set an element's text, adding zhuyin <ruby> in zh-TW. <option>/<select>
+    // can't render HTML, so they always get plain text.
+    setText(el, str) {
+      const plain = el.tagName === "OPTION" || el.tagName === "SELECT";
+      if (this.lang === "zh-tw" && window.ZH && !plain) el.innerHTML = window.ZH.annotate(str);
+      else el.textContent = str;
+    },
+    setKey(el, key) { this.setText(el, this.t(key)); },
+
+    // Return HTML for embedding inside a template string (annotated in zh-TW).
+    markup(str) {
+      return this.lang === "zh-tw" && window.ZH ? window.ZH.annotate(str) : (window.ZH ? window.ZH.esc(str) : str);
+    },
+
     apply() {
       document.documentElement.lang = this.lang;
+      document.body && document.body.classList.toggle("zh", this.lang === "zh-tw");
       document.querySelectorAll("[data-i18n]").forEach((el) => {
-        el.textContent = this.t(el.getAttribute("data-i18n"));
+        this.setText(el, this.t(el.getAttribute("data-i18n")));
       });
       document.querySelectorAll(".lang-btn").forEach((b) => {
         b.classList.toggle("active", b.dataset.lang === this.lang);
