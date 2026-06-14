@@ -4,6 +4,7 @@
   let currentPack = null;  // the array the current level belongs to (for "next")
   let nextLevelRef = null; // resolved on win
   let playOrigin = "menu"; // "menu" | "editor" — where Back returns to
+  let viewMode = localStorage.getItem("cqk_view") || "map"; // "map" | "grid"
 
   // A level is unlocked if it's first in its pack or the previous one was cleared.
   function unlockedIn(pack, lvl) {
@@ -41,20 +42,29 @@
   /* ---------- menu ---------- */
   function renderMenu() {
     $("playerNameDisplay").textContent = Store.getPlayer() || "—";
-    renderLevelGrid();
-    renderBusGrid();
-    renderBuildGrid();
-    renderOceanGrid();
-    renderCargoGrid();
+    updateViewToggle();
+    const render = viewMode === "grid" ? renderPackGrid : renderPackMap;
+    render(LEVELS,       "mazeMap");
+    if (typeof BUS_LEVELS   !== "undefined") render(BUS_LEVELS,   "busMap");
+    if (typeof BUILD_LEVELS !== "undefined") render(BUILD_LEVELS,  "buildMap");
+    if (typeof OCEAN_LEVELS !== "undefined") render(OCEAN_LEVELS,  "oceanMap");
+    if (typeof CARGO_LEVELS !== "undefined") render(CARGO_LEVELS,  "cargoMap");
     renderCustomGrid();
     renderLeaderboard();
   }
 
-  // Shared renderer for a themed pack (bus, build) into a grid element.
-  function renderPackGrid(pack, gridId, badge) {
-    const grid = $(gridId);
-    if (!grid || !pack) return;
-    grid.innerHTML = "";
+  function updateViewToggle() {
+    $("viewGridBtn").classList.toggle("active", viewMode === "grid");
+    $("viewMapBtn").classList.toggle("active",  viewMode === "map");
+  }
+
+  // Flat card grid (original style) rendered into a quest-map-wrap container.
+  function renderPackGrid(pack, containerId) {
+    const wrap = $(containerId);
+    if (!wrap || !pack || !pack.length) return;
+    wrap.innerHTML = "";
+    const grid = document.createElement("div");
+    grid.className = "level-grid";
     pack.forEach((lvl, idx) => {
       const unlocked = unlockedIn(pack, lvl);
       const res = Store.levelResult(lvl.id);
@@ -62,48 +72,146 @@
       card.className = "level-card" + (unlocked ? "" : " locked");
       const stars = res ? "⭐".repeat(res.stars) + "☆".repeat(3 - res.stars) : "☆☆☆";
       card.innerHTML = `
-        <div class="level-num">${badge}${idx + 1}</div>
+        <div class="level-num">${idx + 1}</div>
         <div class="level-name">${I18N.markup(levelName(lvl))}</div>
         <div class="level-stars">${unlocked ? stars : "🔒"}</div>`;
       if (unlocked) card.addEventListener("click", () => startLevel(lvl, "menu", pack));
       else card.title = I18N.t("locked");
       grid.appendChild(card);
     });
-  }
-  function renderBuildGrid() {
-    if (typeof BUILD_LEVELS !== "undefined") renderPackGrid(BUILD_LEVELS, "buildGrid", "🛠️");
-  }
-  function renderOceanGrid() {
-    if (typeof OCEAN_LEVELS !== "undefined") renderPackGrid(OCEAN_LEVELS, "oceanGrid", "🐋");
-  }
-  function renderCargoGrid() {
-    if (typeof CARGO_LEVELS !== "undefined") renderPackGrid(CARGO_LEVELS, "cargoGrid", "🚚");
+    wrap.appendChild(grid);
   }
 
-  function renderLevelGrid() {
-    const grid = $("levelGrid");
-    grid.innerHTML = "";
-    LEVELS.forEach((lvl) => {
-      const unlocked = unlockedIn(LEVELS, lvl);
-      const res = Store.levelResult(lvl.id);
-      const card = document.createElement("button");
-      card.className = "level-card" + (unlocked ? "" : " locked");
-      const stars = res ? "⭐".repeat(res.stars) + "☆".repeat(3 - res.stars) : "☆☆☆";
-      card.innerHTML = `
-        <div class="level-num">${lvl.id}</div>
-        <div class="level-name">${I18N.markup(levelName(lvl))}</div>
-        <div class="level-stars">${unlocked ? stars : "🔒"}</div>`;
-      if (unlocked) {
-        card.addEventListener("click", () => startLevel(lvl, "menu", LEVELS));
-      } else {
-        card.title = I18N.t("locked");
-      }
-      grid.appendChild(card);
+  // Zigzag adventure map for a pack of levels.
+  function renderPackMap(pack, containerId) {
+    const wrap = $(containerId);
+    if (!wrap || !pack || !pack.length) return;
+    wrap.innerHTML = "";
+
+    const MN = 72; // node diameter px
+    const COLS = 3; // nodes per row
+
+    // Determine state for each level in pack order.
+    let foundCurrent = false;
+    const stateOf = pack.map((lvl) => {
+      const done = !!Store.levelResult(lvl.id);
+      if (done) return "done";
+      if (unlockedIn(pack, lvl) && !foundCurrent) { foundCurrent = true; return "current"; }
+      return "locked";
     });
-  }
 
-  function renderBusGrid() {
-    if (typeof BUS_LEVELS !== "undefined") renderPackGrid(BUS_LEVELS, "busGrid", "🚌");
+    const allDone = stateOf.every((s) => s === "done");
+
+    // Split into rows.
+    const rows = [];
+    for (let i = 0; i < pack.length; i += COLS) rows.push(pack.slice(i, i + COLS));
+
+    const map = document.createElement("div");
+    map.className = "quest-map";
+
+    rows.forEach((row, rowIdx) => {
+      const reversed = rowIdx % 2 === 1;
+      const dispLvls   = reversed ? [...row].reverse() : row;
+      const dispStates = dispLvls.map((lvl) => stateOf[pack.indexOf(lvl)]);
+
+      // "72px 1fr 72px 1fr 72px" for N nodes
+      const n = dispLvls.length;
+      const cols = Array.from({ length: n }, (_, i) =>
+        i < n - 1 ? `${MN}px 1fr` : `${MN}px`).join(" ");
+
+      const rowEl = document.createElement("div");
+      rowEl.className = "map-row";
+      rowEl.style.gridTemplateColumns = cols;
+
+      dispLvls.forEach((lvl, i) => {
+        const state = dispStates[i];
+        const packIdx = pack.indexOf(lvl);
+        const res = Store.levelResult(lvl.id);
+
+        const slot = document.createElement("div");
+        slot.className = "map-slot";
+
+        const node = document.createElement("button");
+        node.className = `map-node ${state}`;
+        node.textContent = packIdx + 1;
+        if (state === "locked") {
+          node.disabled = true;
+          node.title = I18N.t("locked");
+        } else {
+          node.addEventListener("click", () => startLevel(lvl, "menu", pack));
+        }
+        slot.appendChild(node);
+
+        const nameEl = document.createElement("div");
+        nameEl.className = "mn-name";
+        I18N.setText(nameEl, levelName(lvl));
+        slot.appendChild(nameEl);
+
+        const starsEl = document.createElement("div");
+        starsEl.className = "mn-stars";
+        if (state === "locked") {
+          starsEl.textContent = "🔒";
+        } else {
+          const s = res ? res.stars : 0;
+          starsEl.textContent = "⭐".repeat(s) + "☆".repeat(3 - s);
+        }
+        slot.appendChild(starsEl);
+        rowEl.appendChild(slot);
+
+        // Horizontal connector (not after last node in row).
+        if (i < dispLvls.length - 1) {
+          // Green if the flow-predecessor is done.
+          const predDone = reversed ? dispStates[i + 1] === "done" : dispStates[i] === "done";
+          const conn = document.createElement("div");
+          conn.className = "map-hconn" + (predDone ? " done" : "");
+          rowEl.appendChild(conn);
+        }
+      });
+
+      map.appendChild(rowEl);
+
+      // Vertical turn connector between rows.
+      if (rowIdx < rows.length - 1) {
+        const dir = reversed ? "turn-left" : "turn-right";
+        // Done when the flow endpoint of this row is done.
+        const endDone = reversed
+          ? dispStates[0] === "done"
+          : dispStates[dispLvls.length - 1] === "done";
+        const turn = document.createElement("div");
+        turn.className = `map-turn ${dir}` + (endDone ? " done" : "");
+        map.appendChild(turn);
+      }
+    });
+
+    // Final short connector from last row exit to trophy.
+    const lastRowIdx   = rows.length - 1;
+    const lastReversed = lastRowIdx % 2 === 1;
+    const posClass     = lastReversed ? "pos-left" : "pos-right";
+
+    const lastRow      = rows[lastRowIdx];
+    const lastDisp     = lastReversed ? [...lastRow].reverse() : lastRow;
+    const lastDispSt   = lastDisp.map((lvl) => stateOf[pack.indexOf(lvl)]);
+    const exitDone     = lastReversed
+      ? lastDispSt[0] === "done"
+      : lastDispSt[lastDispSt.length - 1] === "done";
+
+    const vconn = document.createElement("div");
+    vconn.className = `map-vconn-final ${posClass}` + (exitDone ? " done" : "");
+    map.appendChild(vconn);
+
+    // Trophy.
+    const trophy = document.createElement("div");
+    trophy.className = `map-trophy ${posClass}` + (allDone ? " achieved" : "");
+    const trophyIcon = document.createElement("span");
+    trophyIcon.className = "trophy-icon";
+    trophyIcon.textContent = allDone ? "🏆" : "🏁";
+    const trophyLabel = document.createElement("div");
+    trophyLabel.className = "trophy-label";
+    I18N.setText(trophyLabel, I18N.t(allDone ? "packComplete" : "reachEnd"));
+    trophy.append(trophyIcon, trophyLabel);
+    map.appendChild(trophy);
+
+    wrap.appendChild(map);
   }
 
   function renderCustomGrid() {
@@ -336,6 +444,9 @@
   function wire() {
     document.querySelectorAll(".lang-btn").forEach((b) =>
       b.addEventListener("click", () => I18N.setLang(b.dataset.lang)));
+
+    $("viewGridBtn").addEventListener("click", () => { viewMode = "grid"; localStorage.setItem("cqk_view", "grid"); renderMenu(); });
+    $("viewMapBtn").addEventListener("click",  () => { viewMode = "map";  localStorage.setItem("cqk_view", "map");  renderMenu(); });
 
     $("howToBtn").addEventListener("click", () => { renderHowTo(); openModal("howToModal"); });
     $("muteBtn").addEventListener("click", () => { Sound.unlock(); Sound.toggleMute(); updateMuteBtn(); });

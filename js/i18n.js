@@ -114,6 +114,13 @@
       backToEditor: "Back to editor",
       importPrompt: "Paste quest JSON:",
       importBad: "That doesn't look like a valid quest.",
+      // View toggle
+      viewGrid: "⊞ Grid",
+      viewMap: "🗺 Map",
+      // Pack map
+      mazePack: "Maze Quest",
+      packComplete: "Pack Complete! 🎉",
+      reachEnd: "Reach the end!",
       // Bus & Lights pack
       busPack: "Bus & Lights",
       b1: "First Bus", b1goal: "Drive to the bus stop",
@@ -271,6 +278,13 @@
       backToEditor: "回到編輯器",
       importPrompt: "貼上任務 JSON：",
       importBad: "這看起來不是有效的任務。",
+      // View toggle
+      viewGrid: "⊞ 格子",
+      viewMap: "🗺 路線",
+      // Pack map
+      mazePack: "迷宮關卡",
+      packComplete: "全部過關！🎉",
+      reachEnd: "抵達終點！",
       // Bus & Lights pack
       busPack: "公車與燈光",
       b1: "第一班公車", b1goal: "開到公車站",

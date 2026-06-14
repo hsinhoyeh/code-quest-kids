@@ -313,5 +313,94 @@ body.zh { line-height: 1.4; }
 }
 .expr-btn:active { background: #7c4dff; color: #fff; }
 
+/* ---------- view toggle (grid / map) ---------- */
+.view-toggle-group {
+  display: inline-flex; gap: 4px; justify-content: center;
+  margin: 6px 0 10px; background: #fff; border-radius: 12px;
+  padding: 4px; box-shadow: var(--shadow);
+}
+.view-btn {
+  border: none; background: transparent; border-radius: 9px;
+  padding: 7px 18px; font: inherit; font-size: .9rem; font-weight: 800;
+  cursor: pointer; color: var(--ink); transition: all .12s;
+}
+.view-btn.active { background: var(--accent); color: #fff; }
+.view-btn:hover:not(.active) { background: #e3f2fd; }
+
+/* ---------- quest map ---------- */
+.quest-map-wrap { margin-bottom: 30px; overflow-x: auto; }
+.quest-map { display: flex; flex-direction: column; min-width: 240px; }
+
+.map-row { display: grid; align-items: start; }
+.map-slot { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+
+.map-node {
+  width: 72px; height: 72px; border-radius: 50%; border: none;
+  font-size: 1.35rem; font-weight: 900; cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow); transition: transform .1s; flex-shrink: 0;
+}
+.map-node:hover:not([disabled]) { transform: scale(1.1); }
+.map-node:active:not([disabled]) { transform: scale(0.95); }
+.map-node.done    { background: var(--green); color: #fff; }
+.map-node.current {
+  background: var(--primary); color: #fff;
+  animation: pulse-node 1.6s ease-in-out infinite;
+}
+@keyframes pulse-node {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,112,67,.45), var(--shadow); }
+  60%       { box-shadow: 0 0 0 12px rgba(255,112,67,0), var(--shadow); }
+}
+.map-node.locked {
+  background: #e0e0e0; color: #9e9e9e; cursor: not-allowed;
+  box-shadow: inset 0 2px 0 rgba(0,0,0,.08);
+}
+
+.mn-name {
+  font-size: 0.7rem; font-weight: 700; text-align: center;
+  width: 72px; word-break: break-word; line-height: 1.3; min-height: 2.2em;
+}
+.mn-stars { font-size: 0.75rem; letter-spacing: 1px; }
+.map-node.locked ~ .mn-name  { color: #bbb; }
+.map-node.locked ~ .mn-stars { color: #bbb; }
+
+/* Horizontal path connector between nodes in a row */
+.map-hconn {
+  height: 8px; background: #e0e0e0; border-radius: 4px;
+  margin-top: 32px; /* (72px node − 8px line) / 2 = 32px → aligns with node centre */
+  align-self: start;
+}
+.map-hconn.done { background: var(--green); }
+
+/* Vertical connector between rows (straight line on right or left side) */
+.map-turn { position: relative; height: 44px; width: 100%; }
+.map-turn::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 8px;
+  background: #e0e0e0; border-radius: 4px;
+}
+.map-turn.turn-right::after { right: 36px; } /* 72px / 2 = 36px */
+.map-turn.turn-left::after  { left:  36px; }
+.map-turn.done::after { background: var(--green); }
+
+/* Short vertical connector from last row to trophy */
+.map-vconn-final {
+  width: 8px; height: 36px; background: #e0e0e0; border-radius: 4px;
+}
+.map-vconn-final.pos-left  { margin-left: 36px; }
+.map-vconn-final.pos-right { margin-left: auto; margin-right: 36px; }
+.map-vconn-final.done { background: var(--green); }
+
+/* Trophy at end of pack */
+.map-trophy {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 4px 12px 12px; gap: 4px;
+}
+.map-trophy.pos-left  { align-items: flex-start; padding-left: 8px; }
+.map-trophy.pos-right { align-items: flex-end;   padding-right: 8px; }
+.trophy-icon { font-size: 2.2rem; filter: grayscale(.65); opacity: .65; }
+.map-trophy.achieved .trophy-icon  { filter: none; opacity: 1; animation: pop .5s ease; }
+.trophy-label { font-size: 0.8rem; font-weight: 800; color: #bbb; text-align: center; }
+.map-trophy.achieved .trophy-label { color: #fbc02d; }
+
 /* ---------- footer ---------- */
 .footer { text-align: center; padding: 20px; color: #999; }

@@ -48,32 +48,40 @@
   <main id="screen-menu" class="screen active">
     <section class="hero">
       <h2 data-i18n="pickLevel">Pick a Quest!</h2>
+      <div class="view-toggle-group" role="group">
+        <button id="viewGridBtn" class="view-btn" data-i18n="viewGrid">⊞ Grid</button>
+        <button id="viewMapBtn"  class="view-btn" data-i18n="viewMap">🗺 Map</button>
+      </div>
       <p class="player-line">
         <span data-i18n="playerLabel">Player:</span>
         <strong id="playerNameDisplay">—</strong>
         <button id="changeNameBtn" class="link-btn" data-i18n="changeName">change</button>
       </p>
     </section>
-    <div id="levelGrid" class="level-grid"></div>
+
+    <section class="custom-section">
+      <h3>🤖 <span data-i18n="mazePack">Maze Quest</span></h3>
+      <div id="mazeMap" class="quest-map-wrap"></div>
+    </section>
 
     <section class="custom-section">
       <h3>🚌 <span data-i18n="busPack">Bus &amp; Lights</span></h3>
-      <div id="busGrid" class="level-grid"></div>
+      <div id="busMap" class="quest-map-wrap"></div>
     </section>
 
     <section class="custom-section">
       <h3>🛠️ <span data-i18n="buildPack">Build It!</span></h3>
-      <div id="buildGrid" class="level-grid"></div>
+      <div id="buildMap" class="quest-map-wrap"></div>
     </section>
 
     <section class="custom-section">
       <h3>🐋 <span data-i18n="oceanPack">Ocean</span></h3>
-      <div id="oceanGrid" class="level-grid"></div>
+      <div id="oceanMap" class="quest-map-wrap"></div>
     </section>
 
     <section class="custom-section">
       <h3>🚚 <span data-i18n="cargoPack">Cargo Run</span></h3>
-      <div id="cargoGrid" class="level-grid"></div>
+      <div id="cargoMap" class="quest-map-wrap"></div>
     </section>
 
     <section id="customSection" class="custom-section">
