@@ -35,6 +35,7 @@
     </div>
     <div class="topbar-controls">
       <button id="switchPlayerBtn" class="pill player-pill">👤 <span id="topbarPlayer">—</span></button>
+      <button id="timerPill" class="pill timer-pill" title="Play timer"><span id="timerIcon">⏱</span> <span id="timerDisplay">10:00</span></button>
       <button id="howToBtn" class="pill" data-i18n="howTo">How to play</button>
       <button id="teacherBtn" class="pill">🎓 <span data-i18n="teacher">Teacher</span></button>
       <button id="muteBtn" class="pill" aria-label="sound">🔊</button>
@@ -244,6 +245,44 @@
     </div>
   </div>
 
+  <!-- Time's up modal -->
+  <div id="timeUpModal" class="modal-backdrop">
+    <div class="modal">
+      <div class="time-emoji">⏰</div>
+      <h3 data-i18n="timeUpTitle">Time's up!</h3>
+      <p id="timeUpMsg" data-i18n="timeUpBody">You've used all your play time. Pass to a friend, or take a break.</p>
+      <div class="modal-actions">
+        <button id="timeUpSwitchBtn" class="btn-run" data-i18n="switchNow">Switch player 👤</button>
+        <button id="timeUpOkBtn" class="link-btn" data-i18n="takeBreak">Take a break</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timer settings modal -->
+  <div id="timerModal" class="modal-backdrop">
+    <div class="modal">
+      <h3>⏱ <span data-i18n="timerSettings">Play Timer</span></h3>
+      <label class="timer-toggle">
+        <input type="checkbox" id="timerEnabledInput" />
+        <span data-i18n="timerEnable">Limit each player's time</span>
+      </label>
+      <div class="timer-fields">
+        <label class="field">
+          <span data-i18n="playMinutesLabel">Minutes per turn</span>
+          <input id="playMinutesInput" type="number" min="1" max="120" value="10" />
+        </label>
+        <label class="field">
+          <span data-i18n="cooldownMinutesLabel">Cooldown (minutes)</span>
+          <input id="cooldownMinutesInput" type="number" min="0" max="120" value="5" />
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button id="timerSaveBtn" class="btn-run" data-i18n="saveSettings">Save</button>
+        <button id="timerCloseBtn" class="link-btn" data-i18n="gotIt">Got it!</button>
+      </div>
+    </div>
+  </div>
+
   <!-- How-to modal -->
   <div id="howToModal" class="modal-backdrop">
     <div class="modal">
@@ -266,6 +305,7 @@
   <script src="js/oceanLevels.js"></script>
   <script src="js/cargoLevels.js"></script>
   <script src="js/leaderboard.js"></script>
+  <script src="js/timer.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/blocks.js"></script>
   <script src="js/editor.js"></script>

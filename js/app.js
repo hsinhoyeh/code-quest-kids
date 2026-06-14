@@ -341,6 +341,7 @@
         e.stopPropagation();
         if (confirm(I18N.t("confirmDeletePlayer"))) {
           Store.deletePlayer(name);
+          updateTopbarPlayer();
           renderPlayers();
           renderMenu();
         }
@@ -361,6 +362,7 @@
 
   /* ---------- play ---------- */
   function startLevel(lvl, origin, pack) {
+    if (Timer.isCoolingDown()) { openTimeUpModal(); return; }
     currentLevel = lvl;
     currentPack = pack || null;
     playOrigin = origin || "menu";
@@ -378,6 +380,7 @@
   }
 
   function runProgram() {
+    if (Timer.isCoolingDown()) { onTimerExpire(); return; }
     const program = Blocks.getProgram();
     if (Blocks.count() === 0) {
       toast(I18N.t("programEmpty"));
@@ -419,6 +422,43 @@
     $("runBtn").disabled = !on;
   }
 
+  /* ---------- play timer ---------- */
+  // Fired when the active player's budget runs out (or they act while cooling).
+  function onTimerExpire() {
+    Engine.reset();
+    closeModal("winModal");
+    if ($("screen-play").classList.contains("active")) { show("screen-menu"); renderMenu(); }
+    Sound.oops();
+    openTimeUpModal();
+  }
+
+  function openTimeUpModal() {
+    const cd = Timer.getConfig().cooldownMinutes;
+    const body = cd > 0
+      ? `${I18N.t("timeUpBody")} (🛑 ${Timer.cooldownLabel()})`
+      : I18N.t("timeUpBody");
+    I18N.setText($("timeUpMsg"), body);
+    openModal("timeUpModal");
+  }
+
+  function openTimerSettings() {
+    const c = Timer.getConfig();
+    $("timerEnabledInput").checked = c.enabled;
+    $("playMinutesInput").value = c.playMinutes;
+    $("cooldownMinutesInput").value = c.cooldownMinutes;
+    openModal("timerModal");
+  }
+
+  function saveTimerSettings() {
+    Timer.setConfig({
+      enabled: $("timerEnabledInput").checked,
+      playMinutes: $("playMinutesInput").value,
+      cooldownMinutes: $("cooldownMinutesInput").value,
+    });
+    Timer.setActivePlayer(Store.getPlayer());
+    closeModal("timerModal");
+  }
+
   /* ---------- toast ---------- */
   let toastTimer = null;
   function toast(msg) {
@@ -449,6 +489,12 @@
     $("viewMapBtn").addEventListener("click",  () => { viewMode = "map";  localStorage.setItem("cqk_view", "map");  renderMenu(); });
 
     $("howToBtn").addEventListener("click", () => { renderHowTo(); openModal("howToModal"); });
+
+    $("timerPill").addEventListener("click", openTimerSettings);
+    $("timerSaveBtn").addEventListener("click", saveTimerSettings);
+    $("timerCloseBtn").addEventListener("click", () => closeModal("timerModal"));
+    $("timeUpSwitchBtn").addEventListener("click", () => { closeModal("timeUpModal"); openPlayersModal(); });
+    $("timeUpOkBtn").addEventListener("click", () => { closeModal("timeUpModal"); show("screen-menu"); renderMenu(); });
     $("muteBtn").addEventListener("click", () => { Sound.unlock(); Sound.toggleMute(); updateMuteBtn(); });
     $("closeHowToBtn").addEventListener("click", () => closeModal("howToModal"));
 
@@ -578,6 +624,7 @@
     const name = Store.getPlayer();
     $("topbarPlayer").textContent = name || "—";
     $("switchPlayerBtn").title = I18N.t("switchPlayer");
+    Timer.setActivePlayer(name);
   }
 
   function saveName() {
@@ -595,6 +642,8 @@
     Engine.init($("stage"));
     Editor.init($("editorStage"));
     wire();
+    Timer.init({ onExpire: onTimerExpire });
+    Timer.setActivePlayer(Store.getPlayer());
     updateMuteBtn();
     updateTopbarPlayer();
     if (!Store.getPlayer()) {

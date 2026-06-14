@@ -56,6 +56,24 @@ body {
 }
 .player-pill:hover { background: #bbdefb; }
 
+/* play timer pill */
+.timer-pill {
+  background: linear-gradient(135deg, #e8f5e9, #fff);
+  border: 2px solid #a5d6a7; color: #2e7d32;
+  font-variant-numeric: tabular-nums; min-width: 78px; text-align: center;
+}
+.timer-pill #timerDisplay { letter-spacing: .5px; }
+.timer-pill.warn {
+  background: linear-gradient(135deg, #fff3e0, #fff);
+  border-color: #ffb74d; color: #e65100; animation: timerPulse 1s ease-in-out infinite;
+}
+.timer-pill.cooldown {
+  background: linear-gradient(135deg, #ffebee, #fff);
+  border-color: #ef9a9a; color: #c62828;
+}
+.timer-pill.off { background: #f5f5f5; border-color: #e0e0e0; color: #9e9e9e; }
+@keyframes timerPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
 /* ---------- screens ---------- */
 .screen { display: none; max-width: 1050px; margin: 0 auto; padding: 8px 18px 40px; }
 .screen.active { display: block; }
@@ -211,6 +229,21 @@ body {
 .modal-actions { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
 .win-modal .stars { font-size: 3rem; margin-bottom: 6px; animation: pop .4s ease; }
 .howto-list { text-align: left; line-height: 1.9; font-size: 1.05rem; padding-left: 6px; list-style: none; }
+
+/* timer modals */
+.time-emoji { font-size: 3.2rem; margin-bottom: 4px; animation: pop .3s ease; }
+#timeUpMsg { font-size: 1.05rem; line-height: 1.6; margin: 0 0 18px; }
+.timer-toggle {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-weight: 700; margin-bottom: 16px; cursor: pointer;
+}
+.timer-toggle input { width: 22px; height: 22px; margin: 0; accent-color: var(--green); }
+.timer-fields { display: flex; gap: 14px; margin-bottom: 18px; }
+.timer-fields .field { flex: 1; text-align: left; }
+.timer-fields .field input {
+  width: 100%; padding: 10px; font-size: 1.1rem; border: 2px solid #cfd8dc;
+  border-radius: 10px; text-align: center; margin: 0; font-family: inherit;
+}
 
 /* ---------- toast ---------- */
 .toast {
